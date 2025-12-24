@@ -1,0 +1,15 @@
+{
+  "id": "ct-001",
+  "title": "配列内の2数の和",
+  "difficulty": "easy",
+  "category": ["array", "hash"],
+  "time_limit_sec": 1.0,
+  "memory_limit_mb": 256,
+  "description": "# 配列内の2数の和\n\n## 問題概要\n\n整数の配列 `nums` と目標値 `target` が与えられます。配列内の2つの数の和が `target` と等しくなる組み合わせが存在するかどうかを判定してください。\n\n## 入力仕様\n\n- `nums`: 整数のリスト（長さ: 2以上）\n- `target`: 整数（目標値）\n\n## 出力仕様\n\n- `bool`: 2つの数の和が `target` と等しくなる組み合わせが存在すれば `True`、そうでなければ `False`\n\n## 制約条件\n\n- `2 <= len(nums) <= 10^4`\n- `-10^9 <= nums[i] <= 10^9`\n- `-10^9 <= target <= 10^9`\n- 同じ要素を2回使用することはできません\n\n## サンプル入力・出力\n\n### サンプル1\n\n入力:\n```python\nnums = [2, 7, 11, 15]\ntarget = 9\n```\n\n出力:\n```python\nTrue  # 2 + 7 = 9\n```\n\n### サンプル2\n\n入力:\n```python\nnums = [3, 2, 4]\ntarget = 6\n```\n\n出力:\n```python\nTrue  # 2 + 4 = 6\n```\n\n### サンプル3\n\n入力:\n```python\nnums = [3, 3]\ntarget = 6\n```\n\n出力:\n```python\nTrue  # 3 + 3 = 6\n```\n\n### サンプル4\n\n入力:\n```python\nnums = [1, 2, 3, 4]\ntarget = 10\n```\n\n出力:\n```python\nFalse  # 2数の和が10になる組み合わせは存在しない\n```",
+  "function_signature": "def solve(nums: list[int], target: int) -> bool:",
+  "test_code": "def test_sample1():\n    assert solve([2, 7, 11, 15], 9) == True\n\ndef test_sample2():\n    assert solve([3, 2, 4], 6) == True\n\ndef test_sample3():\n    assert solve([3, 3], 6) == True\n\ndef test_sample4():\n    assert solve([1, 2, 3, 4], 10) == False\n\ndef test_edge_case1():\n    assert solve([1, 1], 2) == True\n\ndef test_edge_case2():\n    assert solve([1, 2], 4) == False\n\ndef test_negative_numbers():\n    assert solve([-1, 0, 1], 0) == True\n\ndef test_large_array():\n    nums = list(range(1000))\n    assert solve(nums, 1998) == True  # 999 + 999 = 1998\n    assert solve(nums, 2000) == False",
+  "supported_languages": ["python", "typescript"],
+  "hint": "## ヒント\n\nこの問題を解くには、以下の方法が考えられます：\n\n1. **ブルートフォース法**: すべての2つの数の組み合わせをチェックする方法（時間計算量: O(n²)）\n2. **ハッシュマップを使用する方法**: 一度の走査で解を見つける方法（時間計算量: O(n)）\n\n効率的な解法では、各要素を見ながら「target - 現在の値」がすでに出現しているかを確認します。\n\n例えば、`nums = [2, 7, 11, 15]`, `target = 9` の場合：\n- 2を見た時点で、7 (= 9 - 2) が必要\n- 7を見た時点で、2 (= 9 - 7) がすでに出現しているので、答えは `True`",
+  "solution": "## 答えと解説\n\n### 解法1: ブルートフォース法（シンプルだが遅い）\n\n```python\ndef solve(nums: list[int], target: int) -> bool:\n    n = len(nums)\n    for i in range(n):\n        for j in range(i + 1, n):\n            if nums[i] + nums[j] == target:\n                return True\n    return False\n```\n\n**時間計算量**: O(n²)\n**空間計算量**: O(1)\n\n### 解法2: ハッシュセットを使用（効率的）\n\n```python\ndef solve(nums: list[int], target: int) -> bool:\n    seen = set()\n    for num in nums:\n        complement = target - num\n        if complement in seen:\n            return True\n        seen.add(num)\n    return False\n```\n\n**時間計算量**: O(n)\n**空間計算量**: O(n)\n\n### 解説\n\n効率的な解法では、配列を一度だけ走査します。各要素を見る際に：\n\n1. 現在の値と組み合わせて`target`になる値（補数）を計算\n2. その補数がすでに出現しているかを確認\n3. 出現していれば `True` を返す\n4. 出現していなければ、現在の値をセットに追加して次の要素へ\n\nこの方法により、時間計算量を O(n²) から O(n) に改善できます。"
+}
+
