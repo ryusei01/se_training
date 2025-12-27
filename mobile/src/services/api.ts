@@ -10,9 +10,15 @@ import {
   SaveDraftRequest,
 } from "../types/api";
 
-// APIベースURL（app.jsonから取得、フォールバックはlocalhost）
+// APIベースURL（app.config.jsから取得、フォールバックはlocalhost）
 const API_BASE_URL =
   Constants.expoConfig?.extra?.apiBaseUrl || "http://localhost:8000";
+
+// デバッグ用: API URLをコンソールに出力
+if (__DEV__) {
+  console.log("API Base URL:", API_BASE_URL);
+  console.log("Expo Config Extra:", Constants.expoConfig?.extra);
+}
 
 class ApiClient {
   private client: AxiosInstance;

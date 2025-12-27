@@ -17,9 +17,6 @@
       "android": {
         "buildType": "app-bundle",
         "gradleCommand": ":app:bundleRelease"
-      },
-      "env": {
-        "EXPO_PUBLIC_API_BASE_URL": "https://your-api-domain.com"
       }
     }
   },
@@ -32,4 +29,3 @@
     }
   }
 }
-

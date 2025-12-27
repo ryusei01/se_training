@@ -67,3 +67,4 @@ eas submit --platform android
 - EAS CLI (`npm install -g eas-cli`) - ビルド・公開時に必要
 
 
+

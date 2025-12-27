@@ -1,6 +1,8 @@
 // app.config.js - 環境変数を使用可能にする設定ファイル
 // app.json の代わりにこのファイルを使用することで、環境変数を動的に設定可能
 
+import "dotenv/config";
+
 export default {
   expo: {
     name: "SE Training",
@@ -27,14 +29,13 @@ export default {
       package: "com.setraining.app",
       versionCode: 1,
       permissions: ["INTERNET"],
-      playStoreUrl: "https://play.google.com/store/apps/details?id=com.setraining.app",
+      playStoreUrl:
+        "https://play.google.com/store/apps/details?id=com.setraining.app",
     },
     web: {
       favicon: "./assets/favicon.png",
     },
-    plugins: [
-      "expo-secure-store",
-    ],
+    plugins: ["expo-secure-store"],
     scheme: "se-training",
     extra: {
       // 環境変数からAPI URLを取得
@@ -49,4 +50,3 @@ export default {
     },
   },
 };
-

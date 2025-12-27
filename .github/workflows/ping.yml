@@ -13,3 +13,4 @@ jobs:
           curl -f ${{ secrets.API_URL }}/health || exit 0
 
 
+
