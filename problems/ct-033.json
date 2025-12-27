@@ -10,3 +10,4 @@
   "test_code": "def test_sample1():\n    root = {\"v\": 1, \"l\": {\"v\": 2, \"l\": None, \"r\": None}, \"r\": {\"v\": 3, \"l\": None, \"r\": None}}\n    result = solve(root)\n    # 経路: 12, 13 → 合計=25\n    assert result == 25\n\ndef test_single_node():\n    root = {\"v\": 5, \"l\": None, \"r\": None}\n    assert solve(root) == 5\n\ndef test_three_levels():\n    root = {\"v\": 1, \"l\": {\"v\": 0, \"l\": {\"v\": 5, \"l\": None, \"r\": None}, \"r\": None}, \"r\": None}\n    result = solve(root)\n    # 経路: 105\n    assert result == 105",
   "supported_languages": ["python", "typescript"]
 }
+

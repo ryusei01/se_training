@@ -32,7 +32,9 @@ export default {
     web: {
       favicon: "./assets/favicon.png",
     },
-    plugins: [],
+    plugins: [
+      "expo-secure-store",
+    ],
     scheme: "se-training",
     extra: {
       // 環境変数からAPI URLを取得

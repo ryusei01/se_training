@@ -18,3 +18,4 @@ npx expo prebuild
 
 または、オンラインツール（https://www.appicon.co/ など）を使用して生成できます。
 
+

@@ -10,3 +10,4 @@
   "test_code": "def test_sample1():\n    nodes = [\n        {\"id\": 1, \"parent\": None},\n        {\"id\": 2, \"parent\": 1},\n        {\"id\": 3, \"parent\": 1},\n        {\"id\": 4, \"parent\": 2},\n        {\"id\": 5, \"parent\": 2}\n    ]\n    result = solve(nodes)\n    assert \"1\" in result[0]\n    assert len(result) == 5\n\ndef test_single_node():\n    nodes = [{\"id\": 1, \"parent\": None}]\n    result = solve(nodes)\n    assert len(result) == 1\n    assert \"1\" in result[0]",
   "supported_languages": ["python", "typescript"]
 }
+

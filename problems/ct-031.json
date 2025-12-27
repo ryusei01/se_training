@@ -10,3 +10,4 @@
   "test_code": "def test_sample1():\n    before = {\"name\": \"A\", \"children\": [{\"name\": \"B\", \"children\": []}, {\"name\": \"C\", \"children\": []}]}\n    after = {\"name\": \"A\", \"children\": [{\"name\": \"B\", \"children\": []}, {\"name\": \"D\", \"children\": []}]}\n    result = solve(before, after)\n    assert \"D\" in result[\"added\"]\n    assert \"C\" in result[\"removed\"]\n\ndef test_no_changes():\n    tree = {\"name\": \"A\", \"children\": []}\n    result = solve(tree, tree)\n    assert len(result[\"added\"]) == 0\n    assert len(result[\"removed\"]) == 0",
   "supported_languages": ["python", "typescript"]
 }
+

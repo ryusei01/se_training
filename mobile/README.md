@@ -66,3 +66,4 @@ eas submit --platform android
 - Expo CLI (`npm install -g expo-cli`)
 - EAS CLI (`npm install -g eas-cli`) - ビルド・公開時に必要
 
+

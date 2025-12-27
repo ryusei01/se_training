@@ -10,3 +10,4 @@
   "test_code": "def test_sample1():\n    s = \"((a)(b(c)))(d)\"\n    result = solve(s)\n    assert \"root\" in result[0] or \"a\" in result[0]\n    assert len(result) >= 4\n\ndef test_single_node():\n    s = \"(a)\"\n    result = solve(s)\n    assert len(result) >= 1\n\ndef test_nested():\n    s = \"(a(b))\";\n    result = solve(s)\n    assert len(result) >= 2",
   "supported_languages": ["python", "typescript"]
 }
+

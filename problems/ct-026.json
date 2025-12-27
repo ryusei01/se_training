@@ -10,3 +10,4 @@
   "test_code": "def test_sample1():\n    lines = [\n        \"root\",\n        \"  src\",\n        \"    index.ts\",\n        \"    util.ts\",\n        \"  test\",\n        \"    index.test.ts\"\n    ]\n    result = solve(lines)\n    assert \"root/src/index.ts\" in result\n    assert \"root/src/util.ts\" in result\n    assert \"root/test/index.test.ts\" in result\n    assert len(result) == 3\n\ndef test_single_file():\n    lines = [\"file.txt\"]\n    result = solve(lines)\n    assert result == [\"file.txt\"]\n\ndef test_nested():\n    lines = [\n        \"a\",\n        \"  b\",\n        \"    c.txt\"\n    ]\n    result = solve(lines)\n    assert \"a/b/c.txt\" in result",
   "supported_languages": ["python", "typescript"]
 }
+

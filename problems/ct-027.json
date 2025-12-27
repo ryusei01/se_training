@@ -10,3 +10,4 @@
   "test_code": "def test_sample1():\n    logs = [\n        \"enter A\",\n        \"enter B\",\n        \"exit B\",\n        \"enter C\",\n        \"exit C\",\n        \"exit A\"\n    ]\n    result = solve(logs)\n    assert \"A\" in result[0]\n    assert \"B\" in \"\".join(result) or \"C\" in \"\".join(result)\n    assert len(result) >= 2\n\ndef test_single_node():\n    logs = [\"enter X\", \"exit X\"]\n    result = solve(logs)\n    assert len(result) == 1\n\ndef test_nested():\n    logs = [\n        \"enter A\",\n        \"enter B\",\n        \"enter C\",\n        \"exit C\",\n        \"exit B\",\n        \"exit A\"\n    ]\n    result = solve(logs)\n    assert len(result) >= 3",
   "supported_languages": ["python", "typescript"]
 }
+

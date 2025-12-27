@@ -10,3 +10,4 @@
   "test_code": "class TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef test_sample1():\n    #        1\n    #      /   \\\n    #     0     4\n    #    / \\   / \\\n    #   5  1  2   3\n    root = TreeNode(1)\n    root.left = TreeNode(0)\n    root.right = TreeNode(4)\n    root.left.left = TreeNode(5)\n    root.left.right = TreeNode(1)\n    root.right.left = TreeNode(2)\n    root.right.right = TreeNode(3)\n    result = solve(root)\n    # 経路: 105, 101, 142, 143\n    # 合計: 491\n    assert result == 491\n\ndef test_single_node():\n    root = TreeNode(5)\n    assert solve(root) == 5\n\ndef test_two_levels():\n    root = TreeNode(1)\n    root.left = TreeNode(2)\n    root.right = TreeNode(3)\n    # 経路: 12, 13\n    # 合計: 25\n    assert solve(root) == 25",
   "supported_languages": ["python", "typescript"]
 }
+

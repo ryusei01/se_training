@@ -10,3 +10,4 @@
   "test_code": "def test_sample1():\n    triangle = [\n        [1],\n        [2, 1],\n        [4, 5, 1],\n        [1, 2, 3, 4]\n    ]\n    result = solve(triangle)\n    assert result[\"maxSum\"] == 12\n    assert result[\"pathCount\"] == 1\n\ndef test_single_row():\n    triangle = [[5]]\n    result = solve(triangle)\n    assert result[\"maxSum\"] == 5\n    assert result[\"pathCount\"] == 1\n\ndef test_multiple_paths():\n    triangle = [\n        [1],\n        [2, 2],\n        [3, 3, 3]\n    ]\n    result = solve(triangle)\n    # 最大: 1+2+3=6, 経路数: 3通り\n    assert result[\"maxSum\"] == 6\n    assert result[\"pathCount\"] == 3",
   "supported_languages": ["python", "typescript"]
 }
+

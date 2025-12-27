@@ -10,3 +10,4 @@
   "test_code": "def test_sample1():\n    root = {\n        \"type\": \"AND\",\n        \"children\": [\n            {\"type\": \"OR\", \"children\": [{\"type\": \"VAR\", \"value\": \"A\"}, {\"type\": \"VAR\", \"value\": \"B\"}]},\n            {\"type\": \"NOT\", \"children\": [{\"type\": \"VAR\", \"value\": \"C\"}]}\n        ]\n    }\n    variables = {\"A\": True, \"B\": False, \"C\": True}\n    result = solve(root, variables)\n    # AND(OR(True, False), NOT(True)) = AND(True, False) = False\n    assert result == False\n\ndef test_single_var():\n    root = {\"type\": \"VAR\", \"value\": \"A\"}\n    variables = {\"A\": True}\n    assert solve(root, variables) == True\n\ndef test_not():\n    root = {\"type\": \"NOT\", \"children\": [{\"type\": \"VAR\", \"value\": \"A\"}]}\n    variables = {\"A\": True}\n    assert solve(root, variables) == False",
   "supported_languages": ["python", "typescript"]
 }
+
