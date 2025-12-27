@@ -100,9 +100,10 @@ export default function ProblemDetailScreen({ route, navigation }: Props) {
   const supportedLanguages = problem.supported_languages || ["python"];
 
   return (
-    <ScrollView 
+    <ScrollView
       ref={scrollViewRef}
       style={styles.container}
+      contentContainerStyle={styles.scrollViewContent}
     >
       <View style={styles.content}>
         <View style={styles.header}>
@@ -198,6 +199,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#f5f5f5",
   },
+  scrollViewContent: {
+    paddingBottom: 100,
+  },
   center: {
     flex: 1,
     justifyContent: "center",
@@ -280,6 +284,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: "center",
     marginTop: 16,
+    marginBottom: 100,
   },
   startButtonText: {
     color: "#fff",

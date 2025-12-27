@@ -17,10 +17,17 @@ app = FastAPI(title="SE Training - Coding Test", version="0.1.0")
 # CORS設定
 # Expoの開発サーバー（Web版: http://localhost:19006, モバイル: exp://localhost:8081）を許可
 # 本番環境では環境変数 ALLOWED_ORIGINS で許可するオリジンを設定する
-allowed_origins = os.getenv(
+# 例: ALLOWED_ORIGINS=https://your-domain.com,https://www.your-domain.com
+allowed_origins_str = os.getenv(
     "ALLOWED_ORIGINS",
     "http://localhost:19006,http://localhost:8081,exp://localhost:8081"
-).split(",")
+)
+# 空の文字列を除去し、空白をトリム
+allowed_origins = [
+    origin.strip() 
+    for origin in allowed_origins_str.split(",") 
+    if origin.strip()
+]
 
 # CORSミドルウェアを追加（フロントエンドからのリクエストを許可）
 app.add_middleware(
@@ -54,6 +61,19 @@ async def root():
         dict: APIの基本情報とドキュメントへのリンク
     """
     return {"message": "SE Training - Coding Test API", "docs": "/docs"}
+
+
+@app.get("/health")
+async def health():
+    """
+    ヘルスチェックエンドポイント
+    
+    本番環境でのスリープ対策や監視用に使用。
+    
+    Returns:
+        dict: ステータス情報
+    """
+    return {"status": "ok", "service": "SE Training API"}
 
 
 
