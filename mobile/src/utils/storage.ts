@@ -1,13 +1,27 @@
-// ローカルストレージ（AsyncStorage）ユーティリティ
+/**
+ * ローカルストレージ（AsyncStorage）ユーティリティ
+ * 
+ * AsyncStorageを使用してローカルにデータを保存・取得する機能を提供する。
+ * オフライン対応のため、ドラフトをローカルにも保存する。
+ */
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+/**
+ * ストレージキーの定義
+ */
 const STORAGE_KEYS = {
-  USER_ID: "@se_training:user_id",
-  DRAFT_PREFIX: "@se_training:draft:",
+  USER_ID: "@se_training:user_id",  // ユーザーIDのキー
+  DRAFT_PREFIX: "@se_training:draft:",  // ドラフトのキーのプレフィックス
 } as const;
 
-// ユーザーIDを取得（なければ生成）
+/**
+ * ユーザーIDを取得する（存在しない場合は生成する）
+ * 
+ * AsyncStorageからユーザーIDを取得し、存在しない場合は新しく生成して保存する。
+ * 
+ * @returns {Promise<string>} ユーザーID
+ */
 export async function getOrCreateUserId(): Promise<string> {
   try {
     let userId = await AsyncStorage.getItem(STORAGE_KEYS.USER_ID);
@@ -19,11 +33,22 @@ export async function getOrCreateUserId(): Promise<string> {
     return userId;
   } catch (error) {
     console.error("Failed to get user ID:", error);
+    // エラー時は一時的なIDを返す
     return `anonymous_${Date.now()}`;
   }
 }
 
-// ドラフトをローカルに保存（オフライン対応）
+/**
+ * ドラフトをローカルに保存する（オフライン対応）
+ * 
+ * サーバーへの保存が失敗した場合でも、ローカルに保存することで
+ * オフライン時でもドラフトを復元できるようにする。
+ * 
+ * @param {string} problemId - 問題ID
+ * @param {string} language - プログラミング言語
+ * @param {string} code - 保存するコード
+ * @returns {Promise<void>}
+ */
 export async function saveDraftLocally(
   problemId: string,
   language: string,
@@ -37,7 +62,13 @@ export async function saveDraftLocally(
   }
 }
 
-// ドラフトをローカルから取得
+/**
+ * ドラフトをローカルから取得する
+ * 
+ * @param {string} problemId - 問題ID
+ * @param {string} language - プログラミング言語
+ * @returns {Promise<string | null>} ドラフトのコード（見つからない場合はnull）
+ */
 export async function getDraftLocally(
   problemId: string,
   language: string

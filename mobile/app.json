@@ -32,7 +32,6 @@
     "plugins": [],
     "scheme": "se-training",
     "extra": {
-      "apiBaseUrl": "http://localhost:8000",
       "eas": {
         "projectId": "898ea8ac-11d3-4b0a-945e-00ef5c17b576"
       }

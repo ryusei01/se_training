@@ -1,8 +1,9 @@
 """
 簡易実行（Phase 1）
 
-- テストを走らせず、ユーザーコードを「スクリプト」として実行する
-- stdin を渡し、stdout/stderr/exit code を返す
+テストを実行せずに、ユーザーコードをスクリプトとして直接実行する機能。
+stdin を渡し、stdout/stderr/exit code を返す。
+デバッグや動作確認に使用される。
 """
 
 from __future__ import annotations
@@ -22,6 +23,26 @@ def run_python_script(
     stdin: Optional[str] = None,
     time_limit_sec: float = 2.0,
 ) -> Dict[str, Any]:
+    """
+    Pythonスクリプトを実行する
+    
+    テストコードを実行せずに、指定されたPythonコードを直接実行する。
+    標準入力を渡すことができ、標準出力、標準エラー出力、終了コードを取得できる。
+    
+    Args:
+        code: 実行するPythonコード
+        stdin: 標準入力（オプション）
+        time_limit_sec: 実行時間制限（秒、デフォルト: 2.0）
+    
+    Returns:
+        Dict[str, Any]: 実行結果
+            - "status": ステータス（"success" | "error" | "timeout"）
+            - "exit_code": 終了コード（int | None）
+            - "stdout": 標準出力（str | None）
+            - "stderr": 標準エラー出力（str | None）
+            - "execution_time_sec": 実行時間（秒、float）
+            - "error_message": エラーメッセージ（str | None）
+    """
     start = time.time()
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
@@ -76,7 +97,25 @@ def run_typescript_script(
     time_limit_sec: float = 2.0,
 ) -> Dict[str, Any]:
     """
-    TypeScript を `npx --yes tsx main.ts` で実行する。
+    TypeScriptスクリプトを実行する
+    
+    テストコードを実行せずに、指定されたTypeScriptコードを直接実行する。
+    tsxを使用してTypeScriptを実行する（`npx --yes tsx main.ts`）。
+    標準入力を渡すことができ、標準出力、標準エラー出力、終了コードを取得できる。
+    
+    Args:
+        code: 実行するTypeScriptコード
+        stdin: 標準入力（オプション）
+        time_limit_sec: 実行時間制限（秒、デフォルト: 2.0）
+    
+    Returns:
+        Dict[str, Any]: 実行結果
+            - "status": ステータス（"success" | "error" | "timeout"）
+            - "exit_code": 終了コード（int | None）
+            - "stdout": 標準出力（str | None）
+            - "stderr": 標準エラー出力（str | None）
+            - "execution_time_sec": 実行時間（秒、float）
+            - "error_message": エラーメッセージ（str | None）
     """
     start = time.time()
     with tempfile.TemporaryDirectory() as tmpdir:

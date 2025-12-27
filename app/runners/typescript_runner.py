@@ -1,5 +1,9 @@
 """
 TypeScriptコードの実行エンジン
+
+TypeScriptコードをtsxを使用して実行する。
+ユーザーのコードをsolution.tsとして保存し、テストコードと組み合わせて実行する。
+Python形式のテストコードをTypeScript形式に変換して実行する。
 """
 import tempfile
 import subprocess
@@ -14,7 +18,12 @@ from app.runners.base_runner import Runner
 
 
 class TypeScriptRunner(Runner):
-    """TypeScriptコードを実行する"""
+    """
+    TypeScriptコードを実行するRunner
+    
+    ユーザーのコードを一時ファイルに保存し、問題のテストコード（Python形式）
+    をTypeScript形式に変換して実行する。テスト結果に基づいて成功/失敗を判定する。
+    """
     
     def execute(
         self,
@@ -23,7 +32,19 @@ class TypeScriptRunner(Runner):
         mode: str = "coding_test"
     ) -> Dict[str, Any]:
         """
-        コードを実行して結果を返す
+        TypeScriptコードを実行してテスト結果を返す
+        
+        Args:
+            problem: 問題情報
+            code: 実行するTypeScriptコード
+            mode: 実行モード（現在は"coding_test"のみ対応）
+        
+        Returns:
+            Dict[str, Any]: 実行結果
+                - "result": 実行結果（"success" | "failure" | "error" | "timeout"）
+                - "execution_time_sec": 実行時間（秒）
+                - "error_message": エラーメッセージ（エラー時）
+                - "test_output": テスト出力
         """
         start_time = time.time()
         
@@ -73,7 +94,17 @@ class TypeScriptRunner(Runner):
     
     def _create_test_file(self, problem: Problem, user_code: str) -> str:
         """
-        テストファイルの内容を生成
+        テストファイルの内容を生成（TypeScript形式）
+        
+        Python形式のテストコードをTypeScript形式に変換し、
+        ユーザーのコードをインポートしてテストを実行可能な形式にする。
+        
+        Args:
+            problem: 問題情報
+            user_code: ユーザーのコード（使用されないが、シグネチャの一貫性のため残している）
+        
+        Returns:
+            str: テストファイルの内容（TypeScriptコード）
         """
         # function_signatureから関数名を抽出
         sig = problem.function_signature
@@ -146,7 +177,19 @@ if (failed === 0) {{
         return test_content
     
     def _extract_test_functions(self, test_code: str, func_name: str) -> str:
-        """テスト関数を抽出して実行コードを生成"""
+        """
+        テスト関数を抽出して実行コードを生成
+        
+        Python形式のテストコードからテスト関数を抽出し、
+        TypeScript形式のテスト実行コードを生成する。
+        
+        Args:
+            test_code: テストコード（Python形式）
+            func_name: ユーザー関数の名前
+        
+        Returns:
+            str: テスト実行コード（TypeScript形式）
+        """
         lines = test_code.split('\n')
         test_functions = []
         current_test = None
@@ -206,7 +249,22 @@ if (failed === 0) {{
         return '\n'.join(test_functions) if test_functions else '  // No tests found'
     
     def _convert_python_to_ts(self, code: str, func_name: str) -> str:
-        """PythonコードをTypeScriptコードに変換"""
+        """
+        PythonコードをTypeScriptコードに変換
+        
+        Python形式のテストコードをTypeScript形式に変換する。
+        - assert文をTypeScriptのif文に変換
+        - == を === に変換
+        - != を !== に変換
+        - solve関数名を実際の関数名に置換
+        
+        Args:
+            code: Python形式のコード
+            func_name: ユーザー関数の名前
+        
+        Returns:
+            str: TypeScript形式のコード
+        """
         # solveを実際の関数名に置換
         code = code.replace('solve', func_name)
         
@@ -224,7 +282,19 @@ if (failed === 0) {{
     
     def _run_typescript(self, test_dir: Path, time_limit_sec: float) -> Dict[str, Any]:
         """
-        TypeScriptコードを実行
+        TypeScriptコードを実行してテスト結果を返す
+        
+        tsxを使用してTypeScriptコードを実行する。
+        
+        Args:
+            test_dir: テストファイルが存在するディレクトリのパス
+            time_limit_sec: 実行時間制限（秒）
+        
+        Returns:
+            Dict[str, Any]: テスト実行結果
+                - "status": ステータス（"success" | "failure" | "timeout" | "error"）
+                - "test_output": テスト出力（成功時）
+                - "error_message": エラーメッセージ（失敗時）
         """
         # tsxを使用してTypeScriptを実行
         test_file = test_dir / "test.ts"

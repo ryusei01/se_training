@@ -1,5 +1,9 @@
 """
 簡易実行の履歴保存・読み込み（Phase 1）
+
+テストを実行せずにコードをスクリプトとして実行した履歴を
+JSONファイルに保存・読み込む機能を提供する。
+data/executions.jsonに実行履歴が保存される。
 """
 
 import json
@@ -10,18 +14,29 @@ from typing import List, Optional
 from app.models.execution import Execution
 
 
+# 実行履歴ファイルが保存されるディレクトリとファイル
 DATA_DIR = Path("data")
 EXECUTIONS_FILE = DATA_DIR / "executions.json"
 
 
 def _ensure_data_file():
+    """
+    データファイルを確保
+    
+    実行履歴ファイルが存在しない場合は、空のJSON配列で初期化する。
+    """
     DATA_DIR.mkdir(exist_ok=True)
     if not EXECUTIONS_FILE.exists():
         EXECUTIONS_FILE.write_text("[]", encoding="utf-8")
 
 
 def save_execution(execution: Execution) -> None:
-    """実行履歴を追記保存"""
+    """
+    実行履歴を追記保存
+    
+    Args:
+        execution: 保存する実行履歴
+    """
     _ensure_data_file()
     history = load_all_executions()
     history.append(execution)
@@ -53,7 +68,12 @@ def save_execution(execution: Execution) -> None:
 
 
 def load_all_executions() -> List[Execution]:
-    """全実行履歴を読み込み"""
+    """
+    全実行履歴を読み込み
+    
+    Returns:
+        List[Execution]: すべての実行履歴のリスト
+    """
     _ensure_data_file()
     try:
         raw = json.loads(EXECUTIONS_FILE.read_text(encoding="utf-8"))
@@ -88,7 +108,18 @@ def get_executions(
     language: Optional[str] = None,
     limit: int = 50,
 ) -> List[Execution]:
-    """条件に合う実行履歴を新しい順に返す"""
+    """
+    条件に合う実行履歴を新しい順に返す
+    
+    Args:
+        user_id: ユーザーIDでフィルタ（オプション）
+        problem_id: 問題IDでフィルタ（オプション）
+        language: 言語でフィルタ（オプション）
+        limit: 取得件数の上限（デフォルト: 50、最大: 200）
+    
+    Returns:
+        List[Execution]: 条件に一致する実行履歴のリスト（新しい順）
+    """
     items = load_all_executions()
     if user_id:
         items = [e for e in items if e.user_id == user_id]

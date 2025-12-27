@@ -1,4 +1,9 @@
-// 実行履歴表示コンポーネント
+/**
+ * 実行履歴表示コンポーネント
+ * 
+ * コードの実行履歴を表示するコンポーネント。
+ * 問題IDや言語でフィルタリングして表示することができる。
+ */
 
 import React, { useEffect, useState } from "react";
 import {
@@ -13,12 +18,24 @@ import { apiClient } from "../services/api";
 import { Execution } from "../types/api";
 import { getOrCreateUserId } from "../utils/storage";
 
+/**
+ * コンポーネントのプロップ型定義
+ */
 interface Props {
-  problemId?: string;
-  language?: string;
-  limit?: number;
+  problemId?: string;  // 問題IDでフィルタ（オプション）
+  language?: string;  // 言語でフィルタ（オプション）
+  limit?: number;  // 表示件数の上限（デフォルト: 20）
 }
 
+/**
+ * 実行履歴表示コンポーネント
+ * 
+ * コードの実行履歴をリスト形式で表示する。
+ * 実行結果、実行日時、実行時間などを表示する。
+ * 
+ * @param {Props} props - コンポーネントのプロップ
+ * @returns {JSX.Element} 実行履歴表示コンポーネント
+ */
 export default function ExecutionHistoryView({
   problemId,
   language,
@@ -31,6 +48,9 @@ export default function ExecutionHistoryView({
     loadHistory();
   }, [problemId, language]);
 
+  /**
+   * 実行履歴を読み込む
+   */
   const loadHistory = async () => {
     try {
       setLoading(true);
@@ -49,6 +69,12 @@ export default function ExecutionHistoryView({
     }
   };
 
+  /**
+   * 日時をフォーマットする
+   * 
+   * @param {string} dateString - ISO形式の日時文字列
+   * @returns {string} フォーマットされた日時文字列
+   */
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
     return date.toLocaleString("ja-JP", {
@@ -60,6 +86,12 @@ export default function ExecutionHistoryView({
     });
   };
 
+  /**
+   * ステータスに応じた色を返す
+   * 
+   * @param {string} status - 実行ステータス
+   * @returns {string} 色コード
+   */
   const getStatusColor = (status: string): string => {
     switch (status) {
       case "success":
@@ -73,6 +105,12 @@ export default function ExecutionHistoryView({
     }
   };
 
+  /**
+   * ステータスに応じた表示テキストを返す
+   * 
+   * @param {string} status - 実行ステータス
+   * @returns {string} 表示テキスト
+   */
   const getStatusText = (status: string): string => {
     switch (status) {
       case "success":

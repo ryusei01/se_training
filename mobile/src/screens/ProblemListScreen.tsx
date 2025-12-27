@@ -1,4 +1,9 @@
-// 問題一覧画面
+/**
+ * 問題一覧画面
+ * 
+ * コーディングテストの問題一覧を表示する画面。
+ * 問題をリスト表示し、カテゴリー別の表示やフィルタリング機能を提供する。
+ */
 
 import React, { useEffect, useState, useRef, useMemo } from "react";
 import {
@@ -19,11 +24,21 @@ import { Problem, Difficulty } from "../types/api";
 
 type Props = NativeStackScreenProps<RootStackParamList, "ProblemList">;
 
-// スクロール位置を保存するためのグローバル変数
+// スクロール位置を保存するためのグローバル変数（画面遷移時に保持）
 let savedScrollOffset = 0;
 
+/** 表示モード */
 type ViewMode = "all" | "category";
 
+/**
+ * 問題一覧画面コンポーネント
+ * 
+ * 問題の一覧を表示し、カテゴリー別の表示やフィルタリング機能を提供する。
+ * 問題をタップすると、問題詳細画面に遷移する。
+ * 
+ * @param {Props} props - ナビゲーションプロップ
+ * @returns {JSX.Element} 問題一覧画面コンポーネント
+ */
 export default function ProblemListScreen({ navigation }: Props) {
   const [problems, setProblems] = useState<Problem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -32,6 +47,9 @@ export default function ProblemListScreen({ navigation }: Props) {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const flatListRef = useRef<FlatList>(null);
 
+  /**
+   * 問題一覧を読み込む
+   */
   const loadProblems = async () => {
     try {
       const data = await apiClient.getProblems();
@@ -72,6 +90,12 @@ export default function ProblemListScreen({ navigation }: Props) {
     loadProblems();
   };
 
+  /**
+   * 難易度に応じた色を返す
+   * 
+   * @param {Difficulty} difficulty - 難易度
+   * @returns {string} 色コード
+   */
   const getDifficultyColor = (difficulty: Difficulty): string => {
     switch (difficulty) {
       case "easy":
@@ -85,11 +109,23 @@ export default function ProblemListScreen({ navigation }: Props) {
     }
   };
 
+  /**
+   * 問題アイテムがタップされたときのハンドラ
+   * 
+   * @param {Problem} item - タップされた問題
+   */
   const handleItemPress = (item: Problem) => {
     // onScrollイベントで既にスクロール位置が保存されているので、そのまま遷移
     navigation.navigate("ProblemDetail", { problemId: item.id });
   };
 
+  /**
+   * スクロールイベントのハンドラ
+   * 
+   * スクロール位置を保存して、画面遷移後に復元できるようにする。
+   * 
+   * @param {any} event - スクロールイベント
+   */
   const handleScroll = (event: any) => {
     // スクロール位置を保存
     savedScrollOffset = event.nativeEvent.contentOffset.y;

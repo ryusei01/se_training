@@ -1,4 +1,9 @@
-// 問題詳細画面
+/**
+ * 問題詳細画面
+ * 
+ * 選択された問題の詳細情報を表示する画面。
+ * 問題文、ヒント、解答、使用言語の選択などを表示する。
+ */
 
 import React, { useEffect, useState, useRef } from "react";
 import {
@@ -18,6 +23,15 @@ import { Problem, Language } from "../types/api";
 
 type Props = NativeStackScreenProps<RootStackParamList, "ProblemDetail">;
 
+/**
+ * 問題詳細画面コンポーネント
+ * 
+ * 問題の詳細情報（問題文、ヒント、解答など）を表示し、
+ * ユーザーが言語を選択してコードエディタに遷移できるようにする。
+ * 
+ * @param {Props} props - ナビゲーションプロップとルートパラメータ
+ * @returns {JSX.Element} 問題詳細画面コンポーネント
+ */
 export default function ProblemDetailScreen({ route, navigation }: Props) {
   const { problemId } = route.params;
   const [problem, setProblem] = useState<Problem | null>(null);
@@ -44,6 +58,9 @@ export default function ProblemDetailScreen({ route, navigation }: Props) {
     }, [])
   );
 
+  /**
+   * 問題情報を読み込む
+   */
   const loadProblem = async () => {
     try {
       const data = await apiClient.getProblem(problemId);
@@ -60,6 +77,11 @@ export default function ProblemDetailScreen({ route, navigation }: Props) {
     }
   };
 
+  /**
+   * 「コードを書く」ボタンが押されたときのハンドラ
+   * 
+   * コードエディタ画面に遷移する。
+   */
   const handleStartCoding = () => {
     navigation.navigate("CodeEditor", {
       problemId: problemId,

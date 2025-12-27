@@ -1,4 +1,10 @@
-// コードエディタ画面（スマホ最適化）
+/**
+ * コードエディタ画面（スマホ最適化）
+ * 
+ * コードを編集・実行する画面。
+ * シンボルバー、スニペットバー、コードエディタ、実行結果の表示機能を提供する。
+ * 編集中のコードは自動的にドラフトとして保存される。
+ */
 
 import React, { useState, useEffect, useRef } from "react";
 import {
@@ -21,7 +27,12 @@ import { getOrCreateUserId, saveDraftLocally, getDraftLocally } from "../utils/s
 
 type Props = NativeStackScreenProps<RootStackParamList, "CodeEditor">;
 
-// シンボルバーの記号リスト
+/**
+ * シンボルバーの記号リスト
+ * 
+ * コード編集時に挿入できる記号のリスト。
+ * ペア記号（{}、[]など）は自動的に閉じる記号も挿入される。
+ */
 const SYMBOLS = [
   { label: "{", value: "{}", insert: (text: string, pos: number) => insertPair(text, pos, "{", "}") },
   { label: "(", value: "()", insert: (text: string, pos: number) => insertPair(text, pos, "(", ")") },
@@ -45,7 +56,17 @@ const SYMBOLS = [
   { label: "!", value: "!" },
 ];
 
-// ペア記号を挿入するヘルパー関数
+/**
+ * ペア記号を挿入するヘルパー関数
+ * 
+ * 開き記号と閉じ記号のペアを挿入し、カーソルを開き記号と閉じ記号の間に配置する。
+ * 
+ * @param {string} text - 現在のテキスト
+ * @param {number} position - カーソル位置
+ * @param {string} open - 開き記号（例: "{"）
+ * @param {string} close - 閉じ記号（例: "}"）
+ * @returns {{newText: string, newPosition: number}} 新しいテキストとカーソル位置
+ */
 function insertPair(
   text: string,
   position: number,
@@ -60,7 +81,12 @@ function insertPair(
   };
 }
 
-// スニペット（Python/TypeScript共通）
+/**
+ * スニペット（Python/TypeScript共通）
+ * 
+ * コード編集時に挿入できるコードスニペットのリスト。
+ * 言語ごとに異なるスニペットが定義されている。
+ */
 const SNIPPETS = {
   python: [
     { label: "if", value: "if :\n    " },
@@ -114,6 +140,12 @@ export default function CodeEditorScreen({ route, navigation }: Props) {
     };
   }, [code, problem, language]);
 
+  /**
+   * 問題情報とドラフトを読み込む
+   * 
+   * 問題情報を取得し、保存されているドラフトがあれば復元する。
+   * ドラフトがない場合は、関数シグネチャから初期コードを生成する。
+   */
   const loadProblemAndDraft = async () => {
     try {
       setLoading(true);
@@ -147,6 +179,15 @@ export default function CodeEditorScreen({ route, navigation }: Props) {
     }
   };
 
+  /**
+   * 初期コードを生成する
+   * 
+   * 問題の関数シグネチャから、選択された言語に応じた初期コードを生成する。
+   * 
+   * @param {Problem} problem - 問題情報
+   * @param {Language} lang - プログラミング言語
+   * @returns {string} 初期コード
+   */
   const generateInitialCode = (problem: Problem, lang: Language): string => {
     if (lang === "typescript") {
       let sig = problem.function_signature;
@@ -162,6 +203,14 @@ export default function CodeEditorScreen({ route, navigation }: Props) {
     }
   };
 
+  /**
+   * ドラフトを保存する
+   * 
+   * 編集中のコードをローカルストレージとサーバーに保存する。
+   * ローカル保存は即座に行われ、サーバー保存は非同期で行われる。
+   * 
+   * @param {string} codeToSave - 保存するコード
+   */
   const saveDraft = async (codeToSave: string) => {
     try {
       const userId = await getOrCreateUserId();
@@ -179,6 +228,14 @@ export default function CodeEditorScreen({ route, navigation }: Props) {
     }
   };
 
+  /**
+   * シンボルボタンが押されたときのハンドラ
+   * 
+   * シンボルをカーソル位置に挿入する。
+   * ペア記号の場合は、開き記号と閉じ記号を挿入し、カーソルを間に配置する。
+   * 
+   * @param {typeof SYMBOLS[0]} symbol - 押されたシンボル
+   */
   const handleSymbolPress = (symbol: typeof SYMBOLS[0]) => {
     if (symbol.insert) {
       const { newText, newPosition } = symbol.insert(
@@ -200,12 +257,25 @@ export default function CodeEditorScreen({ route, navigation }: Props) {
     }
   };
 
+  /**
+   * スニペットボタンが押されたときのハンドラ
+   * 
+   * スニペットをカーソル位置に挿入する。
+   * 
+   * @param {string} snippet - 挿入するスニペット
+   */
   const handleSnippetPress = (snippet: string) => {
     const before = code.substring(0, codeInputPosition.current.start);
     const after = code.substring(codeInputPosition.current.start);
     setCode(before + snippet + after);
   };
 
+  /**
+   * コードを実行する
+   * 
+   * 入力されたコードをサーバーに送信して実行し、結果を表示する。
+   * テストは実行せず、スクリプトとして直接実行される（簡易実行）。
+   */
   const handleRun = async () => {
     if (!code.trim()) {
       Alert.alert("エラー", "コードを入力してください");

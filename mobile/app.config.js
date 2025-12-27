@@ -3,6 +3,13 @@
 
 import "dotenv/config";
 
+// デバッグ用: 環境変数を確認
+console.log(
+  "[app.config.js] EXPO_PUBLIC_API_BASE_URL:",
+  process.env.EXPO_PUBLIC_API_BASE_URL
+);
+console.log("[app.config.js] API_BASE_URL:", process.env.API_BASE_URL);
+
 export default {
   expo: {
     name: "SE Training",

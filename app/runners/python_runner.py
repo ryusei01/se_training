@@ -1,5 +1,8 @@
 """
 Pythonコードの実行エンジン（pytest使用）
+
+Pythonコードを一時ディレクトリに保存し、pytestを使ってテストを実行する。
+ユーザーのコードをsolution.pyとして保存し、テストコードと組み合わせて実行する。
 """
 import tempfile
 import subprocess
@@ -13,7 +16,12 @@ from app.runners.base_runner import Runner
 
 
 class PythonRunner(Runner):
-    """Pythonコードをpytestで実行する"""
+    """
+    Pythonコードをpytestで実行するRunner
+    
+    ユーザーのコードを一時ファイルに保存し、問題のテストコードと組み合わせて
+    pytestで実行する。テスト結果に基づいて成功/失敗を判定する。
+    """
     
     def execute(
         self,
@@ -22,7 +30,19 @@ class PythonRunner(Runner):
         mode: str = "coding_test"
     ) -> Dict[str, Any]:
         """
-        コードを実行して結果を返す
+        Pythonコードを実行してテスト結果を返す
+        
+        Args:
+            problem: 問題情報
+            code: 実行するPythonコード
+            mode: 実行モード（現在は"coding_test"のみ対応）
+        
+        Returns:
+            Dict[str, Any]: 実行結果
+                - "result": 実行結果（"success" | "failure" | "error" | "timeout"）
+                - "execution_time_sec": 実行時間（秒）
+                - "error_message": エラーメッセージ（エラー時）
+                - "test_output": テスト出力
         """
         start_time = time.time()
         
@@ -62,8 +82,16 @@ class PythonRunner(Runner):
     def _create_test_file(self, problem: Problem, user_code: str) -> str:
         """
         テストファイルの内容を生成
-        - ユーザーコードをインポート
-        - 問題のテストコードを追加
+        
+        ユーザーのコードをインポートし、問題のテストコードと組み合わせて
+        pytestで実行可能なテストファイルを作成する。
+        
+        Args:
+            problem: 問題情報
+            user_code: ユーザーのコード（使用されないが、シグネチャの一貫性のため残している）
+        
+        Returns:
+            str: テストファイルの内容（Pythonコード）
         """
         # function_signatureから関数名を抽出
         sig = problem.function_signature
@@ -90,7 +118,17 @@ solve = {func_name}
     
     def _run_pytest(self, test_dir: Path, time_limit_sec: float) -> Dict[str, Any]:
         """
-        pytestを実行
+        pytestを実行してテスト結果を返す
+        
+        Args:
+            test_dir: テストファイルが存在するディレクトリのパス
+            time_limit_sec: 実行時間制限（秒）
+        
+        Returns:
+            Dict[str, Any]: テスト実行結果
+                - "status": ステータス（"success" | "failure" | "timeout" | "error"）
+                - "test_output": テスト出力（成功時）
+                - "error_message": エラーメッセージ（失敗時）
         """
         # pytestコマンドを構築
         cmd = [
