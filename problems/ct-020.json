@@ -1,0 +1,12 @@
+{
+  "id": "ct-020",
+  "title": "葉ノードの合計",
+  "difficulty": "easy",
+  "category": ["tree", "dfs"],
+  "time_limit_sec": 1.0,
+  "memory_limit_mb": 256,
+  "description": "# 葉ノードの合計\n\n## 問題概要\n\n二分木が与えられます。葉（子を持たないノード）の値の合計を求めてください。\n\n## 入力仕様\n\n- `root`: 二分木のルートノード。各ノードは以下のプロパティを持つ\n  - `val`: ノードの値（整数）\n  - `left`: 左の子ノード（ノードまたは `null`）\n  - `right`: 右の子ノード（ノードまたは `null`）\n\n## 出力仕様\n\n- `int`: すべての葉ノードの値の合計\n\n## 制約条件\n\n- ノード数は 1 以上 1000 以下\n- `-10^4 <= val <= 10^4`\n\n## サンプル入力・出力\n\n### サンプル1\n\n入力:\n```\n        7\n      /   \\\n     2     5\n    / \\     \\\n   1   4     3\n```\n\n出力:\n```\n8  # 葉ノード: 1, 4, 3 → 1+4+3=8\n```",
+  "function_signature": "def solve(root) -> int:",
+  "test_code": "class TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef test_sample1():\n    #        7\n    #      /   \\\n    #     2     5\n    #    / \\     \\\n    #   1   4     3\n    root = TreeNode(7)\n    root.left = TreeNode(2)\n    root.right = TreeNode(5)\n    root.left.left = TreeNode(1)\n    root.left.right = TreeNode(4)\n    root.right.right = TreeNode(3)\n    result = solve(root)\n    # 葉ノード: 1, 4, 3 → 合計=8\n    assert result == 8\n\ndef test_single_node():\n    root = TreeNode(5)\n    # 葉ノード: 5\n    assert solve(root) == 5\n\ndef test_two_levels():\n    root = TreeNode(1)\n    root.left = TreeNode(2)\n    root.right = TreeNode(3)\n    # 葉ノード: 2, 3 → 合計=5\n    assert solve(root) == 5",
+  "supported_languages": ["python", "typescript"]
+}

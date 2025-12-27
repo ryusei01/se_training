@@ -1,0 +1,12 @@
+{
+  "id": "ct-022",
+  "title": "重み付き経路スコアの最大値",
+  "difficulty": "hard",
+  "category": ["tree", "dfs", "recursion"],
+  "time_limit_sec": 2.0,
+  "memory_limit_mb": 512,
+  "description": "# 重み付き経路スコアの最大値\n\n## 問題概要\n\nルートから葉まで進むとき、次のルールでスコアを定義します。\n\n- 最初のスコアはルート値\n- 左へ進むたびに「現在スコアを2倍して子の値を足す」\n- 右へ進むたびに「現在スコアを3倍して子の値を足す」\n\nこのとき、全経路のスコアのうち最大値を求めてください。\n\n## 入力仕様\n\n- `root`: 二分木のルートノード。各ノードは以下のプロパティを持つ\n  - `val`: ノードの値（整数）\n  - `left`: 左の子ノード（ノードまたは `null`）\n  - `right`: 右の子ノード（ノードまたは `null`）\n\n## 出力仕様\n\n- `int`: すべての経路のスコアの最大値\n\n## 制約条件\n\n- ノード数は 1 以上 1000 以下\n- `-10^4 <= val <= 10^4`\n\n## サンプル入力・出力\n\n### サンプル1\n\n入力:\n```\n        2\n      /   \\\n     1     3\n    / \\   / \\\n   2   0 1   4\n```\n\n出力:\n```\n29  # 経路1: 2 → 左(2*2+1=5) → 左(5*2+2=12) → スコア=12\n    # 経路2: 2 → 左(2*2+1=5) → 右(5*3+0=15) → スコア=15\n    # 経路3: 2 → 右(2*3+3=9) → 左(9*2+1=19) → スコア=19\n    # 経路4: 2 → 右(2*3+3=9) → 右(9*3+4=31) → スコア=31\n    # 最大: 31\n```\n\n注: 実際の計算では最大スコアは31",
+  "function_signature": "def solve(root) -> int:",
+  "test_code": "class TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef test_sample1():\n    #        2\n    #      /   \\\n    #     1     3\n    #    / \\   / \\\n    #   2   0 1   4\n    root = TreeNode(2)\n    root.left = TreeNode(1)\n    root.right = TreeNode(3)\n    root.left.left = TreeNode(2)\n    root.left.right = TreeNode(0)\n    root.right.left = TreeNode(1)\n    root.right.right = TreeNode(4)\n    result = solve(root)\n    # 経路1: 2 → 左(2*2+1=5) → 左(5*2+2=12) → 12\n    # 経路2: 2 → 左(2*2+1=5) → 右(5*3+0=15) → 15\n    # 経路3: 2 → 右(2*3+3=9) → 左(9*2+1=19) → 19\n    # 経路4: 2 → 右(2*3+3=9) → 右(9*3+4=31) → 31\n    # 最大: 31\n    assert result == 31\n\ndef test_single_node():\n    root = TreeNode(5)\n    assert solve(root) == 5\n\ndef test_two_levels():\n    root = TreeNode(1)\n    root.left = TreeNode(2)\n    root.right = TreeNode(3)\n    # 経路1: 1 → 左(1*2+2=4) → 4\n    # 経路2: 1 → 右(1*3+3=6) → 6\n    # 最大: 6\n    assert solve(root) == 6",
+  "supported_languages": ["python", "typescript"]
+}

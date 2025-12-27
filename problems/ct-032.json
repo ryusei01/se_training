@@ -1,0 +1,12 @@
+{
+  "id": "ct-032",
+  "title": "構文木の評価",
+  "difficulty": "hard",
+  "category": ["tree", "recursion", "evaluation"],
+  "time_limit_sec": 2.0,
+  "memory_limit_mb": 512,
+  "description": "# 構文木の評価\n\n## 問題概要\n\n論理式を表す構文木が与えられます。変数の値が設定されているとき、式の評価結果を返してください。\n\n## 入力仕様\n\n- `root`: 構文木のルートノード。各ノードは以下のプロパティを持つ\n  - `type`: ノードタイプ（\"AND\", \"OR\", \"NOT\", \"VAR\" のいずれか）\n  - `children`: 子ノードのリスト（\"VAR\" の場合は空）\n  - `value`: 変数名（\"VAR\" の場合のみ存在）\n- `variables`: 変数の値の辞書。キーは変数名、値は `True` または `False`\n\n## 出力仕様\n\n- `bool`: 式の評価結果\n\n## 制約条件\n\n- ノード数は 1 以上 1000 以下\n- 構文木は正しい形式\n\n## サンプル入力・出力\n\n### サンプル1\n\n入力:\n```\n構文木:\nAND\n  OR\n    A\n    B\n  NOT\n    C\n\nvariables = {\"A\": True, \"B\": False, \"C\": True}\n```\n\n出力:\n```python\nFalse  # AND(OR(True, False), NOT(True)) = AND(True, False) = False\n```",
+  "function_signature": "def solve(root: dict, variables: dict[str, bool]) -> bool:",
+  "test_code": "def test_sample1():\n    root = {\n        \"type\": \"AND\",\n        \"children\": [\n            {\"type\": \"OR\", \"children\": [{\"type\": \"VAR\", \"value\": \"A\"}, {\"type\": \"VAR\", \"value\": \"B\"}]},\n            {\"type\": \"NOT\", \"children\": [{\"type\": \"VAR\", \"value\": \"C\"}]}\n        ]\n    }\n    variables = {\"A\": True, \"B\": False, \"C\": True}\n    result = solve(root, variables)\n    # AND(OR(True, False), NOT(True)) = AND(True, False) = False\n    assert result == False\n\ndef test_single_var():\n    root = {\"type\": \"VAR\", \"value\": \"A\"}\n    variables = {\"A\": True}\n    assert solve(root, variables) == True\n\ndef test_not():\n    root = {\"type\": \"NOT\", \"children\": [{\"type\": \"VAR\", \"value\": \"A\"}]}\n    variables = {\"A\": True}\n    assert solve(root, variables) == False",
+  "supported_languages": ["python", "typescript"]
+}

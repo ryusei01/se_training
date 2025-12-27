@@ -1,0 +1,12 @@
+{
+  "id": "ct-019",
+  "title": "最小経路和",
+  "difficulty": "medium",
+  "category": ["tree", "dynamic-programming", "dfs"],
+  "time_limit_sec": 1.0,
+  "memory_limit_mb": 256,
+  "description": "# 最小経路和\n\n## 問題概要\n\n数値ツリーが与えられます。ルートから葉までの経路のうち、合計が最小となる経路の合計値を求めてください。\n\n## 入力仕様\n\n- `root`: 二分木のルートノード。各ノードは以下のプロパティを持つ\n  - `val`: ノードの値（整数）\n  - `left`: 左の子ノード（ノードまたは `null`）\n  - `right`: 右の子ノード（ノードまたは `null`）\n\n## 出力仕様\n\n- `int`: ルートから葉までの経路の最小合計値\n\n## 制約条件\n\n- ノード数は 1 以上 1000 以下\n- `-10^4 <= val <= 10^4`\n\n## サンプル入力・出力\n\n### サンプル1\n\n入力:\n```\n        8\n      /   \\\n     1     3\n    / \\   / \\\n   9   2 4   0\n```\n\n出力:\n```\n11  # 経路: 8+1+9=18, 8+1+2=11, 8+3+4=15, 8+3+0=11\n    # 最小: 11\n```",
+  "function_signature": "def solve(root) -> int:",
+  "test_code": "class TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef test_sample1():\n    #        8\n    #      /   \\\n    #     1     3\n    #    / \\   / \\\n    #   9   2 4   0\n    root = TreeNode(8)\n    root.left = TreeNode(1)\n    root.right = TreeNode(3)\n    root.left.left = TreeNode(9)\n    root.left.right = TreeNode(2)\n    root.right.left = TreeNode(4)\n    root.right.right = TreeNode(0)\n    result = solve(root)\n    # 経路: 8+1+9=18, 8+1+2=11, 8+3+4=15, 8+3+0=11\n    # 最小: 11\n    assert result == 11\n\ndef test_single_node():\n    root = TreeNode(5)\n    assert solve(root) == 5\n\ndef test_all_positive():\n    root = TreeNode(1)\n    root.left = TreeNode(2)\n    root.right = TreeNode(3)\n    # 最小: 1+2=3\n    assert solve(root) == 3",
+  "supported_languages": ["python", "typescript"]
+}

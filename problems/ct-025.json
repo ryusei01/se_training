@@ -1,0 +1,12 @@
+{
+  "id": "ct-025",
+  "title": "括弧構造の正規化",
+  "difficulty": "medium",
+  "category": ["stack", "string", "tree"],
+  "time_limit_sec": 1.0,
+  "memory_limit_mb": 256,
+  "description": "# 括弧構造の正規化\n\n## 問題概要\n\n括弧と英小文字からなる文字列が与えられます。\n\n- `(` がノード開始\n- `)` がノード終了\n- 英小文字がノード名\n\nこの構造をインデント付きツリー表現に変換してください。\n\n## 入力仕様\n\n- `s`: 括弧と英小文字からなる文字列\n\n## 出力仕様\n\n- `list[str]`: インデント付きツリー表現の各行（各行は文字列）\n\n## 制約条件\n\n- `1 <= len(s) <= 1000`\n- 括弧は正しく対応している\n- ルートが複数ある場合は仮想的な \"root\" を追加する\n\n## サンプル入力・出力\n\n### サンプル1\n\n入力:\n```python\ns = \"((a)(b(c)))(d)\"\n```\n\n出力:\n```python\n[\n    \"root\",\n    \"  a\",\n    \"  b\",\n    \"    c\",\n    \"  d\"\n]\n```",
+  "function_signature": "def solve(s: str) -> list[str]:",
+  "test_code": "def test_sample1():\n    s = \"((a)(b(c)))(d)\"\n    result = solve(s)\n    assert \"root\" in result[0] or \"a\" in result[0]\n    assert len(result) >= 4\n\ndef test_single_node():\n    s = \"(a)\"\n    result = solve(s)\n    assert len(result) >= 1\n\ndef test_nested():\n    s = \"(a(b))\";\n    result = solve(s)\n    assert len(result) >= 2",
+  "supported_languages": ["python", "typescript"]
+}

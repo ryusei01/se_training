@@ -1,0 +1,12 @@
+{
+  "id": "ct-024",
+  "title": "数値三角形の最大経路和と経路数",
+  "difficulty": "hard",
+  "category": ["dynamic-programming", "array", "counting"],
+  "time_limit_sec": 2.0,
+  "memory_limit_mb": 512,
+  "description": "# 数値三角形の最大経路和と経路数\n\n## 問題概要\n\n数値三角形が与えられます。ルートから最下段までの最大経路和と、その最大経路和を達成する経路の本数を求めてください。\n\n## 入力仕様\n\n- `triangle`: 数値三角形。各行は整数のリストで、i行目（0-indexed）は i+1 個の要素を持つ\n\n## 出力仕様\n\n- `dict`: 以下の2つのプロパティを持つ辞書\n  - `maxSum`: 最大経路和（整数）\n  - `pathCount`: 最大経路和を達成する経路の本数（整数、mod 1,000,000,007）\n\n## 制約条件\n\n- `1 <= len(triangle) <= 2000`\n- `-10^9 <= triangle[i][j] <= 10^9`\n- 負の数が含まれる可能性がある\n- 最大値が同値になる経路が複数存在する可能性がある\n\n## サンプル入力・出力\n\n### サンプル1\n\n入力:\n```python\ntriangle = [\n    [1],\n    [2, 1],\n    [4, 5, 1],\n    [1, 2, 3, 4]\n]\n```\n\n出力:\n```python\n{\n    \"maxSum\": 12,\n    \"pathCount\": 1  # 最大経路: 1→2→5→4 のみ\n}\n```",
+  "function_signature": "def solve(triangle: list[list[int]]) -> dict:",
+  "test_code": "def test_sample1():\n    triangle = [\n        [1],\n        [2, 1],\n        [4, 5, 1],\n        [1, 2, 3, 4]\n    ]\n    result = solve(triangle)\n    assert result[\"maxSum\"] == 12\n    assert result[\"pathCount\"] == 1\n\ndef test_single_row():\n    triangle = [[5]]\n    result = solve(triangle)\n    assert result[\"maxSum\"] == 5\n    assert result[\"pathCount\"] == 1\n\ndef test_multiple_paths():\n    triangle = [\n        [1],\n        [2, 2],\n        [3, 3, 3]\n    ]\n    result = solve(triangle)\n    # 最大: 1+2+3=6, 経路数: 3通り\n    assert result[\"maxSum\"] == 6\n    assert result[\"pathCount\"] == 3",
+  "supported_languages": ["python", "typescript"]
+}

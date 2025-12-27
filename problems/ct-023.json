@@ -1,0 +1,12 @@
+{
+  "id": "ct-023",
+  "title": "数値三角形の最大経路和",
+  "difficulty": "hard",
+  "category": ["dynamic-programming", "array"],
+  "time_limit_sec": 2.0,
+  "memory_limit_mb": 512,
+  "description": "# 数値三角形の最大経路和\n\n## 問題概要\n\n数値三角形が与えられます。ルート（最上段）から最下段まで、隣接する数（真下 or 右下）へ進んでいくときの最大経路和を求めてください。\n\n## 入力仕様\n\n- `triangle`: 数値三角形。各行は整数のリストで、i行目（0-indexed）は i+1 個の要素を持つ\n\n## 出力仕様\n\n- `int`: 最大経路和\n\n## 制約条件\n\n- `1 <= len(triangle) <= 2000`\n- `-10^9 <= triangle[i][j] <= 10^9`\n\n## サンプル入力・出力\n\n### サンプル1\n\n入力:\n```python\ntriangle = [\n    [1],\n    [2, 1],\n    [4, 5, 1],\n    [1, 2, 3, 4]\n]\n```\n\n出力:\n```python\n12  # 最大経路: 1→2→5→4 = 1+2+5+4 = 12\n```",
+  "function_signature": "def solve(triangle: list[list[int]]) -> int:",
+  "test_code": "def test_sample1():\n    triangle = [\n        [1],\n        [2, 1],\n        [4, 5, 1],\n        [1, 2, 3, 4]\n    ]\n    result = solve(triangle)\n    # 最大経路: 1→2→5→4 = 12\n    assert result == 12\n\ndef test_single_row():\n    triangle = [[5]]\n    assert solve(triangle) == 5\n\ndef test_two_rows():\n    triangle = [\n        [1],\n        [2, 3]\n    ]\n    # 最大: 1+3=4\n    assert solve(triangle) == 4\n\ndef test_negative_values():\n    triangle = [\n        [-1],\n        [2, -3],\n        [1, 0, -2]\n    ]\n    result = solve(triangle)\n    # 最大: -1+2+1=2 または -1+2+0=1\n    assert result >= 1",
+  "supported_languages": ["python", "typescript"]
+}

@@ -1,0 +1,12 @@
+{
+  "id": "ct-021",
+  "title": "根→葉の数値として連結",
+  "difficulty": "medium",
+  "category": ["tree", "dfs", "string"],
+  "time_limit_sec": 1.0,
+  "memory_limit_mb": 256,
+  "description": "# 根→葉の数値として連結\n\n## 問題概要\n\n各経路について、ノードの数字を文字列として連結して1つの整数とみなします。その整数を全経路で合計してください。\n\n例：経路 1→0→5 は整数 105 となります。\n\n## 入力仕様\n\n- `root`: 二分木のルートノード。各ノードは以下のプロパティを持つ\n  - `val`: ノードの値（0-9の整数）\n  - `left`: 左の子ノード（ノードまたは `null`）\n  - `right`: 右の子ノード（ノードまたは `null`）\n\n## 出力仕様\n\n- `int`: すべての経路を整数として解釈した値の合計\n\n## 制約条件\n\n- ノード数は 1 以上 1000 以下\n- `0 <= val <= 9`\n\n## サンプル入力・出力\n\n### サンプル1\n\n入力:\n```\n        1\n      /   \\\n     0     4\n    / \\   / \\\n   5  1  2   3\n```\n\n出力:\n```\n1317  # 経路1: 1→0→5 = 105\n      # 経路2: 1→0→1 = 101\n      # 経路3: 1→4→2 = 142\n      # 経路4: 1→4→3 = 143\n      # 合計: 105+101+142+143=491\n```\n\n注: 実際の計算では 105+101+142+143=491",
+  "function_signature": "def solve(root) -> int:",
+  "test_code": "class TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef test_sample1():\n    #        1\n    #      /   \\\n    #     0     4\n    #    / \\   / \\\n    #   5  1  2   3\n    root = TreeNode(1)\n    root.left = TreeNode(0)\n    root.right = TreeNode(4)\n    root.left.left = TreeNode(5)\n    root.left.right = TreeNode(1)\n    root.right.left = TreeNode(2)\n    root.right.right = TreeNode(3)\n    result = solve(root)\n    # 経路: 105, 101, 142, 143\n    # 合計: 491\n    assert result == 491\n\ndef test_single_node():\n    root = TreeNode(5)\n    assert solve(root) == 5\n\ndef test_two_levels():\n    root = TreeNode(1)\n    root.left = TreeNode(2)\n    root.right = TreeNode(3)\n    # 経路: 12, 13\n    # 合計: 25\n    assert solve(root) == 25",
+  "supported_languages": ["python", "typescript"]
+}

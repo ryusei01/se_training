@@ -1,0 +1,12 @@
+{
+  "id": "ct-031",
+  "title": "差分構造の検出",
+  "difficulty": "hard",
+  "category": ["tree", "comparison", "dfs"],
+  "time_limit_sec": 2.0,
+  "memory_limit_mb": 512,
+  "description": "# 差分構造の検出\n\n## 問題概要\n\n2つのツリーが与えられます。追加されたノードと削除されたノードを列挙してください。\n\n## 入力仕様\n\n- `before`: 変更前のツリーのルートノード\n- `after`: 変更後のツリーのルートノード\n\n各ノードは以下のプロパティを持つ：\n- `name`: ノード名（文字列）\n- `children`: 子ノードのリスト\n\n## 出力仕様\n\n- `dict`: 以下の2つのプロパティを持つ辞書\n  - `added`: 追加されたノード名のリスト\n  - `removed`: 削除されたノード名のリスト\n\n## 制約条件\n\n- ノード数は 1 以上 1000 以下\n- ノード名は一意\n\n## サンプル入力・出力\n\n### サンプル1\n\nBefore:\n```\nA\n  B\n  C\n```\n\nAfter:\n```\nA\n  B\n  D\n```\n\n出力:\n```python\n{\n    \"added\": [\"D\"],\n    \"removed\": [\"C\"]\n}\n```",
+  "function_signature": "def solve(before: dict, after: dict) -> dict:",
+  "test_code": "def test_sample1():\n    before = {\"name\": \"A\", \"children\": [{\"name\": \"B\", \"children\": []}, {\"name\": \"C\", \"children\": []}]}\n    after = {\"name\": \"A\", \"children\": [{\"name\": \"B\", \"children\": []}, {\"name\": \"D\", \"children\": []}]}\n    result = solve(before, after)\n    assert \"D\" in result[\"added\"]\n    assert \"C\" in result[\"removed\"]\n\ndef test_no_changes():\n    tree = {\"name\": \"A\", \"children\": []}\n    result = solve(tree, tree)\n    assert len(result[\"added\"]) == 0\n    assert len(result[\"removed\"]) == 0",
+  "supported_languages": ["python", "typescript"]
+}

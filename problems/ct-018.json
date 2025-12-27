@@ -1,0 +1,12 @@
+{
+  "id": "ct-018",
+  "title": "最大経路和",
+  "difficulty": "medium",
+  "category": ["tree", "dynamic-programming", "dfs"],
+  "time_limit_sec": 1.0,
+  "memory_limit_mb": 256,
+  "description": "# 最大経路和\n\n## 問題概要\n\n数値ツリーが与えられます。ルートから葉までの経路のうち、合計が最大となる経路の合計値を求めてください。\n\n## 入力仕様\n\n- `root`: 二分木のルートノード。各ノードは以下のプロパティを持つ\n  - `val`: ノードの値（整数）\n  - `left`: 左の子ノード（ノードまたは `null`）\n  - `right`: 右の子ノード（ノードまたは `null`）\n\n## 出力仕様\n\n- `int`: ルートから葉までの経路の最大合計値\n\n## 制約条件\n\n- ノード数は 1 以上 1000 以下\n- `-10^4 <= val <= 10^4`\n\n## サンプル入力・出力\n\n### サンプル1\n\n入力:\n```\n        5\n      /   \\\n     9     6\n    / \\   / \\\n   4  10 2   7\n```\n\n出力:\n```\n28  # 経路 5→9→10 = 5+9+10 = 24 または 5→6→7 = 5+6+7 = 18\n    # 最大は 5→9→10 = 24\n```\n\n注: 実際の計算では最大経路は 5→9→10 = 24",
+  "function_signature": "def solve(root) -> int:",
+  "test_code": "class TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef test_sample1():\n    #        5\n    #      /   \\\n    #     9     6\n    #    / \\   / \\\n    #   4  10 2   7\n    root = TreeNode(5)\n    root.left = TreeNode(9)\n    root.right = TreeNode(6)\n    root.left.left = TreeNode(4)\n    root.left.right = TreeNode(10)\n    root.right.left = TreeNode(2)\n    root.right.right = TreeNode(7)\n    result = solve(root)\n    # 経路: 5+9+4=18, 5+9+10=24, 5+6+2=13, 5+6+7=18\n    # 最大: 24\n    assert result == 24\n\ndef test_single_node():\n    root = TreeNode(5)\n    assert solve(root) == 5\n\ndef test_negative_values():\n    root = TreeNode(-1)\n    root.left = TreeNode(-2)\n    root.right = TreeNode(-3)\n    # 最大: -1 + (-2) = -3 または -1 + (-3) = -4\n    result = solve(root)\n    assert result == -3 or result == -4",
+  "supported_languages": ["python", "typescript"]
+}

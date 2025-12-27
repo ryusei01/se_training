@@ -1,0 +1,12 @@
+{
+  "id": "ct-027",
+  "title": "イベントログから構造復元",
+  "difficulty": "medium",
+  "category": ["stack", "tree", "parsing"],
+  "time_limit_sec": 1.0,
+  "memory_limit_mb": 256,
+  "description": "# イベントログから構造復元\n\n## 問題概要\n\nログは「処理の開始・終了」を表します。\n\n- `enter X`: 処理Xの開始\n- `exit X`: 処理Xの終了\n\nこれをツリー構造として復元し、インデント表示してください。\n\n## 入力仕様\n\n- `logs`: ログのリスト。各ログは文字列で、`\"enter X\"` または `\"exit X\"` の形式\n\n## 出力仕様\n\n- `list[str]`: インデント付きツリー表現の各行\n\n## 制約条件\n\n- `1 <= len(logs) <= 1000`\n- `enter X` と `exit X` は必ず対応する\n- ネストは正しい\n\n## サンプル入力・出力\n\n### サンプル1\n\n入力:\n```python\nlogs = [\n    \"enter A\",\n    \"enter B\",\n    \"exit B\",\n    \"enter C\",\n    \"exit C\",\n    \"exit A\"\n]\n```\n\n出力:\n```python\n[\n    \"A\",\n    \"  B\",\n    \"  C\"\n]\n```",
+  "function_signature": "def solve(logs: list[str]) -> list[str]:",
+  "test_code": "def test_sample1():\n    logs = [\n        \"enter A\",\n        \"enter B\",\n        \"exit B\",\n        \"enter C\",\n        \"exit C\",\n        \"exit A\"\n    ]\n    result = solve(logs)\n    assert \"A\" in result[0]\n    assert \"B\" in \"\".join(result) or \"C\" in \"\".join(result)\n    assert len(result) >= 2\n\ndef test_single_node():\n    logs = [\"enter X\", \"exit X\"]\n    result = solve(logs)\n    assert len(result) == 1\n\ndef test_nested():\n    logs = [\n        \"enter A\",\n        \"enter B\",\n        \"enter C\",\n        \"exit C\",\n        \"exit B\",\n        \"exit A\"\n    ]\n    result = solve(logs)\n    assert len(result) >= 3",
+  "supported_languages": ["python", "typescript"]
+}

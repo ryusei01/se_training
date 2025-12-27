@@ -1,0 +1,12 @@
+{
+  "id": "ct-029",
+  "title": "DOM風ノードのシリアライズ",
+  "difficulty": "medium",
+  "category": ["tree", "recursion", "string"],
+  "time_limit_sec": 1.0,
+  "memory_limit_mb": 256,
+  "description": "# DOM風ノードのシリアライズ\n\n## 問題概要\n\nDOM風のノード構造をHTML風文字列に変換してください。\n\n- 子がない場合: `<tag></tag>`\n- 子がある場合: 開始タグ → 子 → 終了タグ\n\n## 入力仕様\n\n- `root`: ルートノード。各ノードは以下のプロパティを持つ\n  - `tag`: タグ名（文字列）\n  - `children`: 子ノードのリスト（ノードのリスト）\n\n## 出力仕様\n\n- `str`: HTML風文字列\n\n## 制約条件\n\n- ノード数は 1 以上 1000 以下\n- タグ名は英小文字のみ\n\n## サンプル入力・出力\n\n### サンプル1\n\n入力:\n```\ndiv\n ├─ p\n └─ span\n     └─ a\n```\n\n出力:\n```\n\"<div><p></p><span><a></a></span></div>\"\n```",
+  "function_signature": "def solve(root: dict) -> str:",
+  "test_code": "def test_sample1():\n    root = {\n        \"tag\": \"div\",\n        \"children\": [\n            {\"tag\": \"p\", \"children\": []},\n            {\n                \"tag\": \"span\",\n                \"children\": [{\"tag\": \"a\", \"children\": []}]\n            }\n        ]\n    }\n    result = solve(root)\n    assert \"<div>\" in result\n    assert \"<p></p>\" in result\n    assert \"<span>\" in result\n    assert \"<a></a>\" in result\n    assert result.endswith(\"</div>\")\n\ndef test_single_node():\n    root = {\"tag\": \"div\", \"children\": []}\n    result = solve(root)\n    assert result == \"<div></div>\"\n\ndef test_nested():\n    root = {\n        \"tag\": \"a\",\n        \"children\": [\n            {\"tag\": \"b\", \"children\": [{\"tag\": \"c\", \"children\": []}]}\n        ]\n    }\n    result = solve(root)\n    assert \"<a>\" in result and \"</a>\" in result\n    assert \"<b>\" in result and \"</b>\" in result\n    assert \"<c></c>\" in result",
+  "supported_languages": ["python", "typescript"]
+}

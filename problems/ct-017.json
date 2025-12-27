@@ -1,0 +1,12 @@
+{
+  "id": "ct-017",
+  "title": "全経路和の合計",
+  "difficulty": "easy",
+  "category": ["tree", "dfs", "recursion"],
+  "time_limit_sec": 1.0,
+  "memory_limit_mb": 256,
+  "description": "# 全経路和の合計\n\n## 問題概要\n\n完全二分木が与えられます。ルートから葉までの全ての経路について「経路上の数の合計」を求め、最後にそれらを全部足した値を求めてください。\n\n## 入力仕様\n\n- `root`: 二分木のルートノード。各ノードは以下のプロパティを持つ\n  - `val`: ノードの値（整数）\n  - `left`: 左の子ノード（ノードまたは `null`）\n  - `right`: 右の子ノード（ノードまたは `null`）\n\n## 出力仕様\n\n- `int`: すべての経路の合計値の総和\n\n## 制約条件\n\n- ノード数は 1 以上 1000 以下\n- `-10^4 <= val <= 10^4`\n\n## サンプル入力・出力\n\n### サンプル1\n\n入力:\n```\n        1\n      /   \\\n     2     1\n    / \\   / \\\n   4   5 1   2\n```\n\n出力:\n```\n22  # 経路1: 1+2+4=7, 経路2: 1+2+5=8, 経路3: 1+1+1=3, 経路4: 1+1+2=4\n    # 合計: 7+8+3+4=22\n```",
+  "function_signature": "def solve(root) -> int:",
+  "test_code": "class TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef test_sample1():\n    #        1\n    #      /   \\\n    #     2     1\n    #    / \\   / \\\n    #   4   5 1   2\n    root = TreeNode(1)\n    root.left = TreeNode(2)\n    root.right = TreeNode(1)\n    root.left.left = TreeNode(4)\n    root.left.right = TreeNode(5)\n    root.right.left = TreeNode(1)\n    root.right.right = TreeNode(2)\n    result = solve(root)\n    # 経路: 1+2+4=7, 1+2+5=8, 1+1+1=3, 1+1+2=4\n    # 合計: 7+8+3+4=22\n    assert result == 22\n\ndef test_single_node():\n    root = TreeNode(5)\n    assert solve(root) == 5\n\ndef test_two_levels():\n    root = TreeNode(1)\n    root.left = TreeNode(2)\n    root.right = TreeNode(3)\n    # 経路: 1+2=3, 1+3=4\n    # 合計: 3+4=7\n    assert solve(root) == 7",
+  "supported_languages": ["python", "typescript"]
+}

@@ -82,11 +82,63 @@ deactivate
 
 ```
 problems/          # 問題定義ファイル
-app/               # アプリケーションコード
+app/               # アプリケーションコード（FastAPIバックエンド）
   api/            # APIエンドポイント
   models/         # データモデル
   runners/        # コード実行エンジン
   storage/        # 実行履歴保存
-static/           # フロントエンドファイル
+static/           # フロントエンドファイル（Web UI）
 data/             # 実行履歴データ（自動生成）
+mobile/           # モバイルアプリ（Expo/React Native）
+  src/
+    screens/      # 画面コンポーネント
+    services/     # APIクライアント
+    types/        # TypeScript型定義
+    utils/        # ユーティリティ
+```
+
+## モバイルアプリ
+
+iOS/Android 対応のモバイルアプリが `mobile/` ディレクトリにあります。
+
+詳細は `mobile/MOBILE_README.md` を参照してください。
+
+## 本番環境
+
+本番環境へのデプロイについては `PRODUCTION_SETUP.md` を参照してください。
+
+主なポイント：
+
+- バックエンド API は HTTPS 必須
+- モバイルアプリの本番ビルドは環境変数で API URL を設定
+- CORS 設定が必要
+
+### クイックスタート
+
+```bash
+cd mobile
+npm install
+npm start
+```
+
+実機やエミュレーターで実行するには、Expo Go アプリを使用するか、以下のコマンドで実行できます：
+
+```bash
+npm run android  # Android
+npm run ios      # iOS
+```
+
+### ビルド・公開
+
+Android APK/AAB のビルド:
+
+```bash
+cd mobile
+npm run build:android
+```
+
+Google Play Store への提出:
+
+```bash
+npm run submit:android
 ```
