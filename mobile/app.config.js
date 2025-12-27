@@ -25,7 +25,9 @@ export default {
         backgroundColor: "#2c3e50",
       },
       package: "com.setraining.app",
+      versionCode: 1,
       permissions: ["INTERNET"],
+      playStoreUrl: "https://play.google.com/store/apps/details?id=com.setraining.app",
     },
     web: {
       favicon: "./assets/favicon.png",

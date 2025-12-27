@@ -1,6 +1,6 @@
 // 問題一覧画面
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef, useMemo } from "react";
 import {
   View,
   Text,
@@ -9,18 +9,28 @@ import {
   StyleSheet,
   ActivityIndicator,
   RefreshControl,
+  ScrollView,
 } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { useFocusEffect } from "@react-navigation/native";
 import { RootStackParamList } from "../../App";
 import { apiClient } from "../services/api";
 import { Problem, Difficulty } from "../types/api";
 
 type Props = NativeStackScreenProps<RootStackParamList, "ProblemList">;
 
+// スクロール位置を保存するためのグローバル変数
+let savedScrollOffset = 0;
+
+type ViewMode = "all" | "category";
+
 export default function ProblemListScreen({ navigation }: Props) {
   const [problems, setProblems] = useState<Problem[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>("all");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const flatListRef = useRef<FlatList>(null);
 
   const loadProblems = async () => {
     try {
@@ -41,6 +51,22 @@ export default function ProblemListScreen({ navigation }: Props) {
     loadProblems();
   }, []);
 
+  // 画面がフォーカスされたときにスクロール位置を復元
+  useFocusEffect(
+    React.useCallback(() => {
+      // 少し遅延させてからスクロール位置を復元（レンダリング完了後）
+      const timer = setTimeout(() => {
+        if (flatListRef.current && savedScrollOffset > 0) {
+          flatListRef.current.scrollToOffset({
+            offset: savedScrollOffset,
+            animated: false,
+          });
+        }
+      }, 100);
+      return () => clearTimeout(timer);
+    }, [])
+  );
+
   const onRefresh = () => {
     setRefreshing(true);
     loadProblems();
@@ -59,10 +85,90 @@ export default function ProblemListScreen({ navigation }: Props) {
     }
   };
 
+  const handleItemPress = (item: Problem) => {
+    // onScrollイベントで既にスクロール位置が保存されているので、そのまま遷移
+    navigation.navigate("ProblemDetail", { problemId: item.id });
+  };
+
+  const handleScroll = (event: any) => {
+    // スクロール位置を保存
+    savedScrollOffset = event.nativeEvent.contentOffset.y;
+  };
+
+  // カテゴリー一覧を取得
+  const categories = useMemo(() => {
+    const categorySet = new Set<string>();
+    problems.forEach((problem) => {
+      if (problem.category && Array.isArray(problem.category)) {
+        problem.category.forEach((cat) => categorySet.add(cat));
+      }
+    });
+    return Array.from(categorySet).sort();
+  }, [problems]);
+
+  // フィルターされた問題リスト
+  const filteredProblems = useMemo(() => {
+    if (viewMode === "all") {
+      return problems;
+    }
+    if (selectedCategory === "all") {
+      return problems;
+    }
+    return problems.filter(
+      (problem) =>
+        problem.category && problem.category.includes(selectedCategory)
+    );
+  }, [problems, viewMode, selectedCategory]);
+
+  // カテゴリー別にグループ化
+  const problemsByCategory = useMemo(() => {
+    if (viewMode !== "category") {
+      return {};
+    }
+    const grouped: { [key: string]: Problem[] } = {};
+    filteredProblems.forEach((problem) => {
+      if (problem.category && Array.isArray(problem.category)) {
+        problem.category.forEach((cat) => {
+          if (!grouped[cat]) {
+            grouped[cat] = [];
+          }
+          if (!grouped[cat].find((p) => p.id === problem.id)) {
+            grouped[cat].push(problem);
+          }
+        });
+      } else {
+        if (!grouped["その他"]) {
+          grouped["その他"] = [];
+        }
+        if (!grouped["その他"].find((p) => p.id === problem.id)) {
+          grouped["その他"].push(problem);
+        }
+      }
+    });
+    return grouped;
+  }, [filteredProblems, viewMode]);
+
+  // フラットリスト用のデータ（カテゴリー別表示用）
+  const flatListData = useMemo(() => {
+    if (viewMode === "all") {
+      return filteredProblems;
+    }
+    // カテゴリー別表示の場合は、カテゴリーヘッダーと問題を交互に配置
+    const result: Array<{ type: "category" | "problem"; data: any }> = [];
+    const sortedCategories = Object.keys(problemsByCategory).sort();
+    sortedCategories.forEach((category) => {
+      result.push({ type: "category", data: category });
+      problemsByCategory[category].forEach((problem) => {
+        result.push({ type: "problem", data: problem });
+      });
+    });
+    return result;
+  }, [viewMode, filteredProblems, problemsByCategory]);
+
   const renderItem = ({ item }: { item: Problem }) => (
     <TouchableOpacity
       style={styles.item}
-      onPress={() => navigation.navigate("ProblemDetail", { problemId: item.id })}
+      onPress={() => handleItemPress(item)}
     >
       <View style={styles.itemHeader}>
         <Text style={styles.itemTitle}>{item.id}: {item.title}</Text>
@@ -77,11 +183,28 @@ export default function ProblemListScreen({ navigation }: Props) {
           </Text>
         </View>
       </View>
-      <Text style={styles.itemCategory}>
-        カテゴリ: {item.category.join(", ")}
-      </Text>
+      <View style={styles.categoryTags}>
+        {item.category.map((cat) => (
+          <View key={cat} style={styles.categoryTag}>
+            <Text style={styles.categoryTagText}>{cat}</Text>
+          </View>
+        ))}
+      </View>
     </TouchableOpacity>
   );
+
+  const renderCategoryHeader = ({ item }: { item: string }) => (
+    <View style={styles.categoryHeader}>
+      <Text style={styles.categoryHeaderText}>{item}</Text>
+    </View>
+  );
+
+  const renderFlatListItem = ({ item }: { item: any }) => {
+    if (item.type === "category") {
+      return renderCategoryHeader({ item: item.data });
+    }
+    return renderItem({ item: item.data });
+  };
 
   if (loading) {
     return (
@@ -93,10 +216,102 @@ export default function ProblemListScreen({ navigation }: Props) {
 
   return (
     <View style={styles.container}>
+      <View style={styles.filterSection}>
+        <View style={styles.filterControls}>
+          <Text style={styles.filterLabel}>表示モード:</Text>
+          <View style={styles.viewModeToggle}>
+            <TouchableOpacity
+              style={[
+                styles.viewModeButton,
+                viewMode === "all" && styles.viewModeButtonActive,
+              ]}
+              onPress={() => setViewMode("all")}
+            >
+              <Text
+                style={[
+                  styles.viewModeButtonText,
+                  viewMode === "all" && styles.viewModeButtonTextActive,
+                ]}
+              >
+                すべて
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.viewModeButton,
+                viewMode === "category" && styles.viewModeButtonActive,
+              ]}
+              onPress={() => setViewMode("category")}
+            >
+              <Text
+                style={[
+                  styles.viewModeButtonText,
+                  viewMode === "category" && styles.viewModeButtonTextActive,
+                ]}
+              >
+                カテゴリー別
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+        {viewMode === "category" && (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.categoryFilterScroll}
+          >
+            <TouchableOpacity
+              style={[
+                styles.categoryFilterButton,
+                selectedCategory === "all" && styles.categoryFilterButtonActive,
+              ]}
+              onPress={() => setSelectedCategory("all")}
+            >
+              <Text
+                style={[
+                  styles.categoryFilterButtonText,
+                  selectedCategory === "all" &&
+                    styles.categoryFilterButtonTextActive,
+                ]}
+              >
+                すべて
+              </Text>
+            </TouchableOpacity>
+            {categories.map((category) => (
+              <TouchableOpacity
+                key={category}
+                style={[
+                  styles.categoryFilterButton,
+                  selectedCategory === category &&
+                    styles.categoryFilterButtonActive,
+                ]}
+                onPress={() => setSelectedCategory(category)}
+              >
+                <Text
+                  style={[
+                    styles.categoryFilterButtonText,
+                    selectedCategory === category &&
+                      styles.categoryFilterButtonTextActive,
+                  ]}
+                >
+                  {category}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        )}
+      </View>
       <FlatList
-        data={problems}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
+        ref={flatListRef}
+        data={viewMode === "all" ? filteredProblems : flatListData}
+        renderItem={viewMode === "all" ? renderItem : renderFlatListItem}
+        keyExtractor={(item, index) =>
+          viewMode === "all"
+            ? (item as Problem).id
+            : `${(item as any).type}-${(item as any).data.id || (item as any).data}-${index}`
+        }
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
@@ -157,6 +372,98 @@ const styles = StyleSheet.create({
   itemCategory: {
     fontSize: 14,
     color: "#666",
+  },
+  categoryTags: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    marginTop: 8,
+  },
+  categoryTag: {
+    backgroundColor: "#e3f2fd",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  categoryTagText: {
+    fontSize: 12,
+    color: "#1976d2",
+    fontWeight: "500",
+  },
+  filterSection: {
+    backgroundColor: "#f8f9fa",
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#dee2e6",
+  },
+  filterControls: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  filterLabel: {
+    fontWeight: "bold",
+    color: "#2c3e50",
+    marginRight: 10,
+  },
+  viewModeToggle: {
+    flexDirection: "row",
+    gap: 10,
+  },
+  viewModeButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 4,
+    backgroundColor: "#fff",
+  },
+  viewModeButtonActive: {
+    backgroundColor: "#3498db",
+    borderColor: "#3498db",
+  },
+  viewModeButtonText: {
+    fontSize: 14,
+    color: "#333",
+  },
+  viewModeButtonTextActive: {
+    color: "#fff",
+  },
+  categoryFilterScroll: {
+    marginTop: 10,
+  },
+  categoryFilterButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 16,
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#ddd",
+    marginRight: 8,
+  },
+  categoryFilterButtonActive: {
+    backgroundColor: "#3498db",
+    borderColor: "#3498db",
+  },
+  categoryFilterButtonText: {
+    fontSize: 14,
+    color: "#333",
+  },
+  categoryFilterButtonTextActive: {
+    color: "#fff",
+  },
+  categoryHeader: {
+    backgroundColor: "#e3f2fd",
+    padding: 16,
+    marginTop: 16,
+    marginBottom: 8,
+    borderLeftWidth: 4,
+    borderLeftColor: "#3498db",
+  },
+  categoryHeaderText: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#2c3e50",
   },
   emptyText: {
     fontSize: 16,

@@ -578,6 +578,7 @@
         let allProblems = [];
         let currentViewMode = 'all';
         let selectedCategory = 'all';
+        let savedScrollPosition = 0; // 問題一覧のスクロール位置を保存
         
         // 問題一覧を取得
         async function loadProblems() {
@@ -722,12 +723,22 @@
         // 問題詳細を表示
         async function showProblemDetail(problemId) {
             try {
+                // 現在のスクロール位置を保存（ページ全体のスクロール位置）
+                savedScrollPosition = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+                
                 const response = await fetch(`/api/problems/${problemId}`);
                 const problem = await response.json();
                 currentProblem = problem;
                 
                 document.getElementById('problem-list-view').style.display = 'none';
                 document.getElementById('problem-detail-view').classList.add('active');
+                
+                // 問題詳細画面を一番上にスクロール
+                window.scrollTo({ top: 0, behavior: 'instant' });
+                const detailView = document.getElementById('problem-detail-view');
+                if (detailView) {
+                    detailView.scrollTop = 0;
+                }
                 
                 displayProblemDetail(problem);
                 loadSubmissionHistory(problemId);
@@ -943,6 +954,15 @@
             document.getElementById('problem-list-view').style.display = 'block';
             document.getElementById('problem-detail-view').classList.remove('active');
             currentProblem = null;
+            
+            // 保存したスクロール位置を復元
+            setTimeout(() => {
+                const problemListView = document.getElementById('problem-list-view');
+                if (problemListView) {
+                    problemListView.scrollTop = savedScrollPosition;
+                }
+                window.scrollTo({ top: savedScrollPosition, behavior: 'instant' });
+            }, 0);
         }
         
         // ヒントの表示/非表示

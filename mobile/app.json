@@ -11,9 +11,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#2c3e50"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.setraining.app"
@@ -24,9 +22,9 @@
         "backgroundColor": "#2c3e50"
       },
       "package": "com.setraining.app",
-      "permissions": [
-        "INTERNET"
-      ]
+      "versionCode": 1,
+      "permissions": ["INTERNET"],
+      "playStoreUrl": "https://play.google.com/store/apps/details?id=com.setraining.app"
     },
     "web": {
       "favicon": "./assets/favicon.png"

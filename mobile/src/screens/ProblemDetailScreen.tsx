@@ -1,6 +1,6 @@
 // 問題詳細画面
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { useFocusEffect } from "@react-navigation/native";
 import Markdown from "react-native-markdown-display";
 import { RootStackParamList } from "../../App";
 import { apiClient } from "../services/api";
@@ -24,10 +25,24 @@ export default function ProblemDetailScreen({ route, navigation }: Props) {
   const [selectedLanguage, setSelectedLanguage] = useState<Language>("python");
   const [showHint, setShowHint] = useState(false);
   const [showSolution, setShowSolution] = useState(false);
+  const scrollViewRef = useRef<ScrollView>(null);
 
   useEffect(() => {
     loadProblem();
   }, [problemId]);
+
+  // 画面がフォーカスされたときに一番上にスクロール
+  useFocusEffect(
+    React.useCallback(() => {
+      // 少し遅延させてからスクロール（レンダリング完了後）
+      const timer = setTimeout(() => {
+        if (scrollViewRef.current) {
+          scrollViewRef.current.scrollTo({ y: 0, animated: false });
+        }
+      }, 100);
+      return () => clearTimeout(timer);
+    }, [])
+  );
 
   const loadProblem = async () => {
     try {
@@ -63,7 +78,10 @@ export default function ProblemDetailScreen({ route, navigation }: Props) {
   const supportedLanguages = problem.supported_languages || ["python"];
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView 
+      ref={scrollViewRef}
+      style={styles.container}
+    >
       <View style={styles.content}>
         <View style={styles.header}>
           <Text style={styles.title}>{problem.id}: {problem.title}</Text>
