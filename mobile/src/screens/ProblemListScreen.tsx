@@ -45,6 +45,7 @@ export default function ProblemListScreen({ navigation }: Props) {
   const [refreshing, setRefreshing] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>("all");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [error, setError] = useState<string | null>(null);
   const flatListRef = useRef<FlatList>(null);
 
   /**
@@ -52,13 +53,15 @@ export default function ProblemListScreen({ navigation }: Props) {
    */
   const loadProblems = async () => {
     try {
+      setError(null);
       const data = await apiClient.getProblems();
       setProblems(data);
     } catch (error: any) {
       console.error("Failed to load problems:", error);
-      // エラーメッセージをアラートで表示
+      // エラーメッセージを状態に設定
       const errorMessage = error?.response?.data?.detail || error?.message || "問題の読み込みに失敗しました";
-      alert(`エラー: ${errorMessage}\n\nAPI URLの設定を確認してください。\n詳細は SETUP_API_URL.md を参照してください。`);
+      setError(`エラー: ${errorMessage}\n\nAPI URLの設定を確認してください。\n詳細は SETUP_API_URL.md を参照してください。`);
+      setProblems([]);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -252,6 +255,11 @@ export default function ProblemListScreen({ navigation }: Props) {
 
   return (
     <View style={styles.container}>
+      {error && (
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>{error}</Text>
+        </View>
+      )}
       <View style={styles.filterSection}>
         <View style={styles.filterControls}>
           <Text style={styles.filterLabel}>表示モード:</Text>
@@ -353,7 +361,11 @@ export default function ProblemListScreen({ navigation }: Props) {
         }
         ListEmptyComponent={
           <View style={styles.center}>
-            <Text style={styles.emptyText}>問題がありません</Text>
+            {error ? (
+              <Text style={styles.emptyText}>問題の読み込みに失敗しました</Text>
+            ) : (
+              <Text style={styles.emptyText}>問題がありません</Text>
+            )}
           </View>
         }
       />
@@ -511,6 +523,22 @@ const styles = StyleSheet.create({
     color: "#999",
     textAlign: "center",
     paddingHorizontal: 20,
+  },
+  errorContainer: {
+    backgroundColor: "#fee",
+    borderBottomWidth: 1,
+    borderBottomColor: "#fcc",
+    padding: 16,
+    marginHorizontal: 16,
+    marginTop: 8,
+    borderRadius: 8,
+    borderLeftWidth: 4,
+    borderLeftColor: "#dc3545",
+  },
+  errorText: {
+    fontSize: 14,
+    color: "#721c24",
+    lineHeight: 20,
   },
 });
 
