@@ -56,6 +56,7 @@ npm start
 - [開発者向けドキュメント](docs/DEVELOPMENT.md) - セットアップと開発ガイド
 - [問題フォーマット](docs/PROBLEM_FORMAT.md) - 問題の追加方法
 - [デプロイメントガイド](docs/deployment/DEPLOY.md) - 本番環境へのデプロイ
+- [GitHub Actions 設定ガイド](docs/deployment/GITHUB_ACTIONS_SETUP.md) - CI/CD の設定方法
 - [モバイルアプリドキュメント](mobile/docs/MOBILE_README.md) - モバイルアプリの詳細
 
 ## プロジェクト構造
