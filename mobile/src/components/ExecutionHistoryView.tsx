@@ -126,24 +126,40 @@ export default function ExecutionHistoryView({
 
   const renderItem = ({ item }: { item: Execution }) => (
     <View
+      testID={`execution-history-item-${item.execution_id}`}
       style={[
         styles.item,
         { borderLeftColor: getStatusColor(item.status) },
       ]}
     >
-      <View style={styles.itemHeader}>
-        <Text style={[styles.statusText, { color: getStatusColor(item.status) }]}>
+      <View style={styles.itemHeader} testID={`execution-history-item-header-${item.execution_id}`}>
+        <Text 
+          testID={`execution-history-item-status-${item.execution_id}`}
+          style={[styles.statusText, { color: getStatusColor(item.status) }]}
+        >
           {getStatusText(item.status)}
         </Text>
-        <Text style={styles.dateText}>{formatDate(item.timestamp)}</Text>
+        <Text 
+          testID={`execution-history-item-date-${item.execution_id}`}
+          style={styles.dateText}
+        >
+          {formatDate(item.timestamp)}
+        </Text>
       </View>
       {item.execution_time_sec !== undefined && (
-        <Text style={styles.metaText}>
+        <Text 
+          testID={`execution-history-item-time-${item.execution_id}`}
+          style={styles.metaText}
+        >
           実行時間: {item.execution_time_sec.toFixed(3)}秒
         </Text>
       )}
       {item.error_message && (
-        <Text style={styles.errorText} numberOfLines={2}>
+        <Text 
+          testID={`execution-history-item-error-${item.execution_id}`}
+          style={styles.errorText} 
+          numberOfLines={2}
+        >
           {item.error_message}
         </Text>
       )}
@@ -152,23 +168,24 @@ export default function ExecutionHistoryView({
 
   if (loading) {
     return (
-      <View style={styles.center}>
-        <ActivityIndicator size="small" color="#2c3e50" />
+      <View style={styles.center} testID="execution-history-loading">
+        <ActivityIndicator size="small" color="#2c3e50" testID="execution-history-loading-indicator" />
       </View>
     );
   }
 
   if (executions.length === 0) {
     return (
-      <View style={styles.center}>
-        <Text style={styles.emptyText}>実行履歴がありません</Text>
+      <View style={styles.center} testID="execution-history-empty">
+        <Text style={styles.emptyText} testID="execution-history-empty-text">実行履歴がありません</Text>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} testID="execution-history-container">
       <FlatList
+        testID="execution-history-list"
         data={executions}
         renderItem={renderItem}
         keyExtractor={(item) => item.execution_id}

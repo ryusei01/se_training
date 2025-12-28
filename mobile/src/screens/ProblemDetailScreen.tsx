@@ -1,6 +1,6 @@
 /**
  * 問題詳細画面
- * 
+ *
  * 選択された問題の詳細情報を表示する画面。
  * 問題文、ヒント、解答、使用言語の選択などを表示する。
  */
@@ -16,7 +16,7 @@ import {
 } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useFocusEffect } from "@react-navigation/native";
-import Markdown from "react-native-markdown-display";
+import MarkdownRenderer from "../components/MarkdownRenderer";
 import { RootStackParamList } from "../../App";
 import { apiClient } from "../services/api";
 import { Problem, Language } from "../types/api";
@@ -25,10 +25,10 @@ type Props = NativeStackScreenProps<RootStackParamList, "ProblemDetail">;
 
 /**
  * 問題詳細画面コンポーネント
- * 
+ *
  * 問題の詳細情報（問題文、ヒント、解答など）を表示し、
  * ユーザーが言語を選択してコードエディタに遷移できるようにする。
- * 
+ *
  * @param {Props} props - ナビゲーションプロップとルートパラメータ
  * @returns {JSX.Element} 問題詳細画面コンポーネント
  */
@@ -79,7 +79,7 @@ export default function ProblemDetailScreen({ route, navigation }: Props) {
 
   /**
    * 「コードを書く」ボタンが押されたときのハンドラ
-   * 
+   *
    * コードエディタ画面に遷移する。
    */
   const handleStartCoding = () => {
@@ -91,8 +91,12 @@ export default function ProblemDetailScreen({ route, navigation }: Props) {
 
   if (loading || !problem) {
     return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color="#2c3e50" />
+      <View style={styles.center} testID="problem-detail-loading">
+        <ActivityIndicator
+          size="large"
+          color="#2c3e50"
+          testID="problem-detail-loading-indicator"
+        />
       </View>
     );
   }
@@ -104,27 +108,43 @@ export default function ProblemDetailScreen({ route, navigation }: Props) {
       ref={scrollViewRef}
       style={styles.container}
       contentContainerStyle={styles.scrollViewContent}
+      testID="problem-detail-screen"
     >
       <View style={styles.content}>
-        <View style={styles.header}>
-          <Text style={styles.title}>{problem.id}: {problem.title}</Text>
-          <View style={styles.meta}>
-            <Text style={styles.category}>
+        <View style={styles.header} testID="problem-detail-header">
+          <Text style={styles.title} testID="problem-detail-title">
+            {problem.id}: {problem.title}
+          </Text>
+          <View style={styles.meta} testID="problem-detail-meta">
+            <Text style={styles.category} testID="problem-detail-category">
               カテゴリ: {problem.category.join(", ")}
             </Text>
           </View>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>問題文</Text>
-          <View style={styles.description}>
-            <Markdown>{problem.description}</Markdown>
+        <View
+          style={styles.section}
+          testID="problem-detail-description-section"
+        >
+          <Text
+            style={styles.sectionTitle}
+            testID="problem-detail-description-title"
+          >
+            問題文
+          </Text>
+          <View
+            style={styles.description}
+            testID="problem-detail-description"
+            nativeID="problem-detail-description-markdown"
+          >
+            <MarkdownRenderer content={problem.description} />
           </View>
         </View>
 
         {problem.hint && (
-          <View style={styles.section}>
+          <View style={styles.section} testID="problem-detail-hint-section">
             <TouchableOpacity
+              testID="problem-detail-hint-toggle"
               style={styles.toggleButton}
               onPress={() => setShowHint(!showHint)}
             >
@@ -133,16 +153,21 @@ export default function ProblemDetailScreen({ route, navigation }: Props) {
               </Text>
             </TouchableOpacity>
             {showHint && (
-              <View style={styles.description}>
-                <Markdown>{problem.hint}</Markdown>
+              <View
+                style={styles.description}
+                testID="problem-detail-hint-content"
+                nativeID="problem-detail-hint-markdown"
+              >
+                <MarkdownRenderer content={problem.hint} />
               </View>
             )}
           </View>
         )}
 
         {problem.solution && (
-          <View style={styles.section}>
+          <View style={styles.section} testID="problem-detail-solution-section">
             <TouchableOpacity
+              testID="problem-detail-solution-toggle"
               style={styles.toggleButton}
               onPress={() => setShowSolution(!showSolution)}
             >
@@ -151,19 +176,32 @@ export default function ProblemDetailScreen({ route, navigation }: Props) {
               </Text>
             </TouchableOpacity>
             {showSolution && (
-              <View style={styles.description}>
-                <Markdown>{problem.solution}</Markdown>
+              <View
+                style={styles.description}
+                testID="problem-detail-solution-content"
+                nativeID="problem-detail-solution-markdown"
+              >
+                <MarkdownRenderer content={problem.solution} />
               </View>
             )}
           </View>
         )}
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>使用言語</Text>
-          <View style={styles.languageSelector}>
+        <View style={styles.section} testID="problem-detail-language-section">
+          <Text
+            style={styles.sectionTitle}
+            testID="problem-detail-language-title"
+          >
+            使用言語
+          </Text>
+          <View
+            style={styles.languageSelector}
+            testID="problem-detail-language-selector"
+          >
             {supportedLanguages.map((lang) => (
               <TouchableOpacity
                 key={lang}
+                testID={`language-button-${lang}`}
                 style={[
                   styles.languageButton,
                   selectedLanguage === lang && styles.languageButtonActive,
@@ -173,7 +211,8 @@ export default function ProblemDetailScreen({ route, navigation }: Props) {
                 <Text
                   style={[
                     styles.languageButtonText,
-                    selectedLanguage === lang && styles.languageButtonTextActive,
+                    selectedLanguage === lang &&
+                      styles.languageButtonTextActive,
                   ]}
                 >
                   {lang === "python" ? "Python" : "TypeScript"}
@@ -184,10 +223,16 @@ export default function ProblemDetailScreen({ route, navigation }: Props) {
         </View>
 
         <TouchableOpacity
+          testID="start-coding-button"
           style={styles.startButton}
           onPress={handleStartCoding}
         >
-          <Text style={styles.startButtonText}>コードを書く</Text>
+          <Text
+            style={styles.startButtonText}
+            testID="start-coding-button-text"
+          >
+            コードを書く
+          </Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -292,4 +337,3 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
-

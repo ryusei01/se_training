@@ -20,7 +20,7 @@ import {
   Alert,
 } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import Markdown from "react-native-markdown-display";
+import MarkdownRenderer from "../components/MarkdownRenderer";
 import * as Clipboard from "expo-clipboard";
 import { RootStackParamList } from "../../App";
 import { apiClient } from "../services/api";
@@ -487,8 +487,12 @@ export default function CodeEditorScreen({ route, navigation }: Props) {
 
   if (loading || !problem) {
     return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color="#2c3e50" />
+      <View style={styles.center} testID="code-editor-loading">
+        <ActivityIndicator
+          size="large"
+          color="#2c3e50"
+          testID="code-editor-loading-indicator"
+        />
       </View>
     );
   }
@@ -500,15 +504,18 @@ export default function CodeEditorScreen({ route, navigation }: Props) {
       style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+      testID="code-editor-screen"
     >
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollViewContent}
         keyboardShouldPersistTaps="handled"
+        testID="code-editor-scroll-view"
       >
         {/* Undo/Redoバー */}
-        <View style={styles.undoRedoBar}>
+        <View style={styles.undoRedoBar} testID="code-editor-undo-redo-bar">
           <TouchableOpacity
+            testID="code-editor-undo-button"
             style={[
               styles.undoRedoButton,
               historyIndex <= 0 && styles.undoRedoButtonDisabled,
@@ -526,6 +533,7 @@ export default function CodeEditorScreen({ route, navigation }: Props) {
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
+            testID="code-editor-redo-button"
             style={[
               styles.undoRedoButton,
               historyIndex >= history.length - 1 &&
@@ -552,10 +560,12 @@ export default function CodeEditorScreen({ route, navigation }: Props) {
           style={styles.symbolBar}
           showsHorizontalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
+          testID="code-editor-symbol-bar"
         >
           {SYMBOLS.map((symbol, index) => (
             <TouchableOpacity
               key={index}
+              testID={`symbol-button-${symbol.label}`}
               style={styles.symbolButton}
               onPress={() => handleSymbolPress(symbol)}
               activeOpacity={0.7}
@@ -571,10 +581,12 @@ export default function CodeEditorScreen({ route, navigation }: Props) {
           style={styles.snippetBar}
           showsHorizontalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
+          testID="code-editor-snippet-bar"
         >
           {snippets.map((snippet, index) => (
             <TouchableOpacity
               key={index}
+              testID={`snippet-button-${snippet.label}`}
               style={styles.snippetButton}
               onPress={() => handleSnippetPress(snippet.value)}
               activeOpacity={0.7}
@@ -585,25 +597,39 @@ export default function CodeEditorScreen({ route, navigation }: Props) {
         </ScrollView>
 
         {/* 問題文とコピーボタン */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>問題文</Text>
+        <View style={styles.section} testID="code-editor-problem-section">
+          <View
+            style={styles.sectionHeader}
+            testID="code-editor-problem-header"
+          >
+            <Text
+              style={styles.sectionTitle}
+              testID="code-editor-problem-title"
+            >
+              問題文
+            </Text>
             <TouchableOpacity
+              testID="code-editor-copy-problem-button"
               style={styles.copyButton}
               onPress={handleCopyProblem}
             >
               <Text style={styles.copyButtonText}>問題文コピー</Text>
             </TouchableOpacity>
           </View>
-          <View style={styles.description}>
-            <Markdown>{problem.description}</Markdown>
+          <View
+            style={styles.description}
+            testID="code-editor-problem-description"
+            nativeID="code-editor-problem-description-markdown"
+          >
+            <MarkdownRenderer content={problem.description} />
           </View>
         </View>
 
         {/* ヒント */}
         {problem.hint && (
-          <View style={styles.section}>
+          <View style={styles.section} testID="code-editor-hint-section">
             <TouchableOpacity
+              testID="code-editor-hint-toggle"
               style={styles.toggleButton}
               onPress={() => setShowHint(!showHint)}
             >
@@ -612,8 +638,12 @@ export default function CodeEditorScreen({ route, navigation }: Props) {
               </Text>
             </TouchableOpacity>
             {showHint && (
-              <View style={styles.description}>
-                <Markdown>{problem.hint}</Markdown>
+              <View
+                style={styles.description}
+                testID="code-editor-hint-content"
+                nativeID="code-editor-hint-markdown"
+              >
+                <MarkdownRenderer content={problem.hint} />
               </View>
             )}
           </View>
@@ -621,8 +651,9 @@ export default function CodeEditorScreen({ route, navigation }: Props) {
 
         {/* 答えと解説 */}
         {problem.solution && (
-          <View style={styles.section}>
+          <View style={styles.section} testID="code-editor-solution-section">
             <TouchableOpacity
+              testID="code-editor-solution-toggle"
               style={styles.toggleButton}
               onPress={() => setShowSolution(!showSolution)}
             >
@@ -631,18 +662,25 @@ export default function CodeEditorScreen({ route, navigation }: Props) {
               </Text>
             </TouchableOpacity>
             {showSolution && (
-              <View style={styles.description}>
-                <Markdown>{problem.solution}</Markdown>
+              <View
+                style={styles.description}
+                testID="code-editor-solution-content"
+                nativeID="code-editor-solution-markdown"
+              >
+                <MarkdownRenderer content={problem.solution} />
               </View>
             )}
           </View>
         )}
 
         {/* コードエディタ */}
-        <View style={styles.editorContainer}>
-          <View style={styles.editorHeader}>
-            <Text style={styles.editorLabel}>コード ({language})</Text>
+        <View style={styles.editorContainer} testID="code-editor-container">
+          <View style={styles.editorHeader} testID="code-editor-header">
+            <Text style={styles.editorLabel} testID="code-editor-label">
+              コード ({language})
+            </Text>
             <TouchableOpacity
+              testID="code-editor-copy-code-button"
               style={styles.copyButton}
               onPress={handleCopyCode}
             >
@@ -650,6 +688,7 @@ export default function CodeEditorScreen({ route, navigation }: Props) {
             </TouchableOpacity>
           </View>
           <TextInput
+            testID="code-editor-input"
             ref={(ref) => setCodeInputRef(ref)}
             style={styles.codeInput}
             value={code}
@@ -667,16 +706,25 @@ export default function CodeEditorScreen({ route, navigation }: Props) {
         </View>
 
         {/* 標準入力（オプション） */}
-        <View style={styles.stdinContainer}>
-          <View style={styles.stdinHeader}>
+        <View
+          style={styles.stdinContainer}
+          testID="code-editor-stdin-container"
+        >
+          <View style={styles.stdinHeader} testID="code-editor-stdin-header">
             <View>
-              <Text style={styles.stdinLabel}>標準入力（オプション）</Text>
-              <Text style={styles.stdinDescription}>
+              <Text style={styles.stdinLabel} testID="code-editor-stdin-label">
+                標準入力（オプション）
+              </Text>
+              <Text
+                style={styles.stdinDescription}
+                testID="code-editor-stdin-description"
+              >
                 コード内のinput()やreadline()などで読み込む値を入力します
               </Text>
             </View>
           </View>
           <TextInput
+            testID="code-editor-stdin-input"
             style={styles.stdinInput}
             value={stdin}
             onChangeText={setStdin}
@@ -688,22 +736,40 @@ export default function CodeEditorScreen({ route, navigation }: Props) {
 
         {/* 実行ボタン */}
         <TouchableOpacity
+          testID="code-editor-run-button"
           style={[styles.runButton, executing && styles.runButtonDisabled]}
           onPress={handleRun}
           disabled={executing}
         >
           {executing ? (
-            <ActivityIndicator color="#fff" />
+            <ActivityIndicator
+              color="#fff"
+              testID="code-editor-run-button-loading"
+            />
           ) : (
-            <Text style={styles.runButtonText}>実行</Text>
+            <Text
+              style={styles.runButtonText}
+              testID="code-editor-run-button-text"
+            >
+              実行
+            </Text>
           )}
         </TouchableOpacity>
 
         {/* 実行結果 */}
         {executionResult && (
-          <View style={styles.resultContainer}>
-            <Text style={styles.resultTitle}>実行結果</Text>
+          <View
+            style={styles.resultContainer}
+            testID="code-editor-execution-result"
+          >
+            <Text
+              style={styles.resultTitle}
+              testID="code-editor-execution-result-title"
+            >
+              実行結果
+            </Text>
             <View
+              testID={`code-editor-execution-result-status-${executionResult.status}`}
               style={[
                 styles.resultStatus,
                 executionResult.status === "success" && styles.resultSuccess,
@@ -711,7 +777,10 @@ export default function CodeEditorScreen({ route, navigation }: Props) {
                 executionResult.status === "timeout" && styles.resultTimeout,
               ]}
             >
-              <Text style={styles.resultStatusText}>
+              <Text
+                style={styles.resultStatusText}
+                testID="code-editor-execution-result-status-text"
+              >
                 {executionResult.status === "success"
                   ? "✓ 成功"
                   : executionResult.status === "error"
@@ -722,25 +791,50 @@ export default function CodeEditorScreen({ route, navigation }: Props) {
               </Text>
             </View>
             {executionResult.stdout && (
-              <View style={styles.resultSection}>
-                <Text style={styles.resultSectionTitle}>標準出力:</Text>
-                <Text style={styles.resultText}>{executionResult.stdout}</Text>
+              <View
+                style={styles.resultSection}
+                testID="code-editor-execution-result-stdout"
+              >
+                <Text
+                  style={styles.resultSectionTitle}
+                  testID="code-editor-execution-result-stdout-title"
+                >
+                  標準出力:
+                </Text>
+                <Text
+                  style={styles.resultText}
+                  testID="code-editor-execution-result-stdout-text"
+                >
+                  {executionResult.stdout}
+                </Text>
               </View>
             )}
             {(executionResult.stderr || executionResult.error_message) && (
-              <View style={styles.resultSection}>
-                <Text style={styles.resultSectionTitle}>
+              <View
+                style={styles.resultSection}
+                testID="code-editor-execution-result-stderr"
+              >
+                <Text
+                  style={styles.resultSectionTitle}
+                  testID="code-editor-execution-result-stderr-title"
+                >
                   {executionResult.stderr
                     ? "標準エラー出力:"
                     : "エラーメッセージ:"}
                 </Text>
-                <Text style={[styles.resultText, styles.resultErrorText]}>
+                <Text
+                  style={[styles.resultText, styles.resultErrorText]}
+                  testID="code-editor-execution-result-stderr-text"
+                >
                   {executionResult.stderr || executionResult.error_message}
                 </Text>
               </View>
             )}
             {executionResult.execution_time_sec !== undefined && (
-              <Text style={styles.resultMeta}>
+              <Text
+                style={styles.resultMeta}
+                testID="code-editor-execution-result-time"
+              >
                 実行時間: {executionResult.execution_time_sec.toFixed(3)}秒
               </Text>
             )}

@@ -206,12 +206,14 @@ export default function ProblemListScreen({ navigation }: Props) {
 
   const renderItem = ({ item }: { item: Problem }) => (
     <TouchableOpacity
+      testID={`problem-item-${item.id}`}
       style={styles.item}
       onPress={() => handleItemPress(item)}
     >
       <View style={styles.itemHeader}>
-        <Text style={styles.itemTitle}>{item.id}: {item.title}</Text>
+        <Text style={styles.itemTitle} testID={`problem-item-title-${item.id}`}>{item.id}: {item.title}</Text>
         <View
+          testID={`problem-item-difficulty-${item.id}`}
           style={[
             styles.difficultyBadge,
             { backgroundColor: getDifficultyColor(item.difficulty) },
@@ -224,7 +226,7 @@ export default function ProblemListScreen({ navigation }: Props) {
       </View>
       <View style={styles.categoryTags}>
         {item.category.map((cat) => (
-          <View key={cat} style={styles.categoryTag}>
+          <View key={cat} style={styles.categoryTag} testID={`problem-item-category-${item.id}-${cat}`}>
             <Text style={styles.categoryTagText}>{cat}</Text>
           </View>
         ))}
@@ -233,7 +235,7 @@ export default function ProblemListScreen({ navigation }: Props) {
   );
 
   const renderCategoryHeader = ({ item }: { item: string }) => (
-    <View style={styles.categoryHeader}>
+    <View style={styles.categoryHeader} testID={`category-header-${item}`}>
       <Text style={styles.categoryHeaderText}>{item}</Text>
     </View>
   );
@@ -247,24 +249,25 @@ export default function ProblemListScreen({ navigation }: Props) {
 
   if (loading) {
     return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color="#2c3e50" />
+      <View style={styles.center} testID="problem-list-loading">
+        <ActivityIndicator size="large" color="#2c3e50" testID="problem-list-loading-indicator" />
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} testID="problem-list-screen">
       {error && (
-        <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>{error}</Text>
+        <View style={styles.errorContainer} testID="problem-list-error">
+          <Text style={styles.errorText} testID="problem-list-error-text">{error}</Text>
         </View>
       )}
-      <View style={styles.filterSection}>
+      <View style={styles.filterSection} testID="problem-list-filter-section">
         <View style={styles.filterControls}>
           <Text style={styles.filterLabel}>表示モード:</Text>
           <View style={styles.viewModeToggle}>
             <TouchableOpacity
+              testID="view-mode-all-button"
               style={[
                 styles.viewModeButton,
                 viewMode === "all" && styles.viewModeButtonActive,
@@ -281,6 +284,7 @@ export default function ProblemListScreen({ navigation }: Props) {
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
+              testID="view-mode-category-button"
               style={[
                 styles.viewModeButton,
                 viewMode === "category" && styles.viewModeButtonActive,
@@ -305,6 +309,7 @@ export default function ProblemListScreen({ navigation }: Props) {
             style={styles.categoryFilterScroll}
           >
             <TouchableOpacity
+              testID="category-filter-all-button"
               style={[
                 styles.categoryFilterButton,
                 selectedCategory === "all" && styles.categoryFilterButtonActive,
@@ -324,6 +329,7 @@ export default function ProblemListScreen({ navigation }: Props) {
             {categories.map((category) => (
               <TouchableOpacity
                 key={category}
+                testID={`category-filter-${category}-button`}
                 style={[
                   styles.categoryFilterButton,
                   selectedCategory === category &&
@@ -346,6 +352,7 @@ export default function ProblemListScreen({ navigation }: Props) {
         )}
       </View>
       <FlatList
+        testID="problem-list"
         ref={flatListRef}
         data={viewMode === "all" ? filteredProblems : flatListData}
         renderItem={viewMode === "all" ? renderItem : renderFlatListItem}
@@ -360,11 +367,11 @@ export default function ProblemListScreen({ navigation }: Props) {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
         ListEmptyComponent={
-          <View style={styles.center}>
+          <View style={styles.center} testID="problem-list-empty">
             {error ? (
-              <Text style={styles.emptyText}>問題の読み込みに失敗しました</Text>
+              <Text style={styles.emptyText} testID="problem-list-empty-error">問題の読み込みに失敗しました</Text>
             ) : (
-              <Text style={styles.emptyText}>問題がありません</Text>
+              <Text style={styles.emptyText} testID="problem-list-empty-no-problems">問題がありません</Text>
             )}
           </View>
         }

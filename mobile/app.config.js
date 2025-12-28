@@ -4,10 +4,7 @@
 import "dotenv/config";
 
 // デバッグ用: 環境変数を確認
-console.log(
-  "[app.config.js] EXPO_PUBLIC_API_BASE_URL:",
-  process.env.EXPO_PUBLIC_API_BASE_URL
-);
+console.log("[app.config.js] API_BASE_URL:", process.env.API_BASE_URL);
 
 export default {
   expo: {
@@ -44,7 +41,8 @@ export default {
     plugins: ["expo-secure-store"],
     scheme: "se-training",
     extra: {
-      // 環境変数からAPI URLを取得
+      // 環境変数からAPI URLを取得（本番環境用）
+      // 注意: デバッグ環境（開発モード）では、api.tsで常にlocalhostが使用されます
       // 優先順位: EXPO_PUBLIC_API_BASE_URL > API_BASE_URL > デフォルト値
       apiBaseUrl:
         process.env.EXPO_PUBLIC_API_BASE_URL ||

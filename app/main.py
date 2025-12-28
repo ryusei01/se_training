@@ -18,16 +18,23 @@ app = FastAPI(title="SE Training - Coding Test", version="0.1.0")
 # Expoの開発サーバー（Web版: http://localhost:19006, モバイル: exp://localhost:8081）を許可
 # 本番環境では環境変数 ALLOWED_ORIGINS で許可するオリジンを設定する
 # 例: ALLOWED_ORIGINS=https://your-domain.com,https://www.your-domain.com
-allowed_origins_str = os.getenv(
-    "ALLOWED_ORIGINS",
-    "http://localhost:19006,http://localhost:8081,exp://localhost:8081"
-)
+
+# デフォルト値（開発環境用）
+default_origins = "http://localhost:19006,http://localhost:8081,exp://localhost:8081"
+
+# 環境変数から取得（未設定の場合はデフォルト値を使用）
+allowed_origins_str = os.getenv("ALLOWED_ORIGINS", default_origins)
+
 # 空の文字列を除去し、空白をトリム
 allowed_origins = [
     origin.strip() 
     for origin in allowed_origins_str.split(",") 
     if origin.strip()
 ]
+
+# デバッグ用: 許可されているオリジンをログ出力（開発環境のみ）
+if os.getenv("ENVIRONMENT") != "production":
+    print(f"[CORS] Allowed origins: {allowed_origins}")
 
 # CORSミドルウェアを追加（フロントエンドからのリクエストを許可）
 app.add_middleware(
