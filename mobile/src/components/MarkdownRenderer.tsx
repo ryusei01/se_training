@@ -6,7 +6,14 @@
  */
 
 import React from "react";
-import { View, Text, StyleSheet, Platform, Linking, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Platform,
+  Linking,
+  TouchableOpacity,
+} from "react-native";
 
 interface MarkdownRendererProps {
   content: string;
@@ -25,8 +32,15 @@ const parseMarkdown = (text: string): React.ReactNode[] => {
   while (i < lines.length) {
     const line = lines[i];
 
-    // 見出し（# ## ###）
-    if (line.startsWith("### ")) {
+    // 見出し（# ## ### ####）
+    if (line.startsWith("#### ")) {
+      elements.push(
+        <Text key={`h4-${i}`} style={styles.h4}>
+          {parseInlineElements(line.substring(5))}
+        </Text>
+      );
+      i++;
+    } else if (line.startsWith("### ")) {
       elements.push(
         <Text key={`h3-${i}`} style={styles.h3}>
           {parseInlineElements(line.substring(4))}
@@ -80,7 +94,9 @@ const parseMarkdown = (text: string): React.ReactNode[] => {
       if (match) {
         elements.push(
           <View key={`ol-${i}`} style={styles.listItem}>
-            <Text style={styles.listBullet}>{line.trim().match(/^\d+/)?.[0]}.</Text>
+            <Text style={styles.listBullet}>
+              {line.trim().match(/^\d+/)?.[0]}.
+            </Text>
             <Text style={styles.listText}>{parseInlineElements(match[1])}</Text>
           </View>
         );
@@ -124,7 +140,7 @@ const parseMarkdown = (text: string): React.ReactNode[] => {
 };
 
 /**
- * インライン要素をパース（リンク、画像、太字、イタリック、インラインコード）
+ * インライン要素をパース（リンク、画像、インラインコード、太字、打ち消し線、イタリック）
  */
 const parseInlineElements = (text: string): React.ReactNode[] => {
   if (!text) return [];
@@ -133,7 +149,7 @@ const parseInlineElements = (text: string): React.ReactNode[] => {
   let remaining = text;
   let key = 0;
 
-  // 優先順位: 画像 > リンク > インラインコード > 太字 > イタリック
+  // 優先順位: 画像 > リンク > インラインコード > 太字 > 打ち消し線 > イタリック
   while (remaining.length > 0) {
     // 画像（![alt](url)）
     const imageMatch = remaining.match(/!\[([^\]]*)\]\(([^)]+)\)/);
@@ -149,7 +165,9 @@ const parseInlineElements = (text: string): React.ReactNode[] => {
         </Text>
       );
       key++;
-      remaining = remaining.substring((imageMatch.index || 0) + imageMatch[0].length);
+      remaining = remaining.substring(
+        (imageMatch.index || 0) + imageMatch[0].length
+      );
       continue;
     }
 
@@ -176,7 +194,9 @@ const parseInlineElements = (text: string): React.ReactNode[] => {
         </Text>
       );
       key++;
-      remaining = remaining.substring((linkMatch.index || 0) + linkMatch[0].length);
+      remaining = remaining.substring(
+        (linkMatch.index || 0) + linkMatch[0].length
+      );
       continue;
     }
 
@@ -194,7 +214,29 @@ const parseInlineElements = (text: string): React.ReactNode[] => {
         </Text>
       );
       key++;
-      remaining = remaining.substring((codeMatch.index || 0) + codeMatch[0].length);
+      remaining = remaining.substring(
+        (codeMatch.index || 0) + codeMatch[0].length
+      );
+      continue;
+    }
+
+    // 打ち消し線（~~text~~）
+    const strikethroughMatch = remaining.match(/~~([^~]+)~~/);
+    if (strikethroughMatch) {
+      const before = remaining.substring(0, strikethroughMatch.index);
+      if (before) {
+        parts.push(...parseTextInline(before, key));
+        key += before.length;
+      }
+      parts.push(
+        <Text key={`strikethrough-${key}`} style={styles.strikethrough}>
+          {parseTextInline(strikethroughMatch[1], key + 1000)}
+        </Text>
+      );
+      key++;
+      remaining = remaining.substring(
+        (strikethroughMatch.index || 0) + strikethroughMatch[0].length
+      );
       continue;
     }
 
@@ -220,9 +262,7 @@ const parseTextInline = (text: string, startKey: number): React.ReactNode[] => {
     if (boldMatch) {
       const before = remaining.substring(0, boldMatch.index);
       if (before) {
-        parts.push(
-          <Text key={`text-${key}`}>{before}</Text>
-        );
+        parts.push(<Text key={`text-${key}`}>{before}</Text>);
         key += before.length;
       }
       parts.push(
@@ -231,19 +271,21 @@ const parseTextInline = (text: string, startKey: number): React.ReactNode[] => {
         </Text>
       );
       key++;
-      remaining = remaining.substring((boldMatch.index || 0) + boldMatch[0].length);
+      remaining = remaining.substring(
+        (boldMatch.index || 0) + boldMatch[0].length
+      );
       continue;
     }
 
     // イタリック（*text* または _text_）- 太字と区別するため、単一の*または_をチェック
     // 太字（**）が既に処理されているので、単一の*や_を探す
-    const italicMatch = remaining.match(/(?<!\*)\*(?!\*)([^*]+?)\*(?!\*)|(?<!_)_(?!_)([^_]+?)_(?!_)/);
+    const italicMatch = remaining.match(
+      /(?<!\*)\*(?!\*)([^*]+?)\*(?!\*)|(?<!_)_(?!_)([^_]+?)_(?!_)/
+    );
     if (italicMatch) {
       const before = remaining.substring(0, italicMatch.index);
       if (before) {
-        parts.push(
-          <Text key={`text-${key}`}>{before}</Text>
-        );
+        parts.push(<Text key={`text-${key}`}>{before}</Text>);
         key += before.length;
       }
       const italicText = italicMatch[1] || italicMatch[2];
@@ -253,15 +295,15 @@ const parseTextInline = (text: string, startKey: number): React.ReactNode[] => {
         </Text>
       );
       key++;
-      remaining = remaining.substring((italicMatch.index || 0) + italicMatch[0].length);
+      remaining = remaining.substring(
+        (italicMatch.index || 0) + italicMatch[0].length
+      );
       continue;
     }
 
     // 残りのテキスト
     if (remaining) {
-      parts.push(
-        <Text key={`text-${key}`}>{remaining}</Text>
-      );
+      parts.push(<Text key={`text-${key}`}>{remaining}</Text>);
     }
     break;
   }
@@ -306,6 +348,14 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     color: "#34495e",
     lineHeight: 24,
+  },
+  h4: {
+    fontSize: 17,
+    fontWeight: "bold",
+    marginTop: 10,
+    marginBottom: 6,
+    color: "#34495e",
+    lineHeight: 22,
   },
   // 段落
   paragraph: {
@@ -375,6 +425,11 @@ const styles = StyleSheet.create({
   italic: {
     fontStyle: "italic",
   },
+  // 打ち消し線
+  strikethrough: {
+    textDecorationLine: "line-through",
+    color: "#666",
+  },
   // リンク
   link: {
     color: "#3498db",
@@ -409,4 +464,3 @@ const styles = StyleSheet.create({
     height: 8,
   },
 });
-
