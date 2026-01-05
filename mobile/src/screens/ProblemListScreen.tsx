@@ -5,7 +5,7 @@
  * 問題をリスト表示し、カテゴリー別の表示やフィルタリング機能を提供する。
  */
 
-import React, { useEffect, useState, useRef, useMemo } from "react";
+import React, { useState, useRef, useMemo, useCallback } from "react";
 import {
   View,
   Text,
@@ -21,6 +21,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { RootStackParamList } from "../../App";
 import { apiClient } from "../services/api";
 import { Problem, Difficulty } from "../types/api";
+import { getErrorMessage } from "../utils/errorHandler";
 
 type Props = NativeStackScreenProps<RootStackParamList, "ProblemList">;
 
@@ -29,6 +30,11 @@ let savedScrollOffset = 0;
 
 /** 表示モード */
 type ViewMode = "all" | "category";
+
+/**
+ * FlatList表示用の要素型（カテゴリ見出し/問題）
+ */
+type ProblemListItem = Problem | { type: "category" | "problem"; data: any };
 
 /**
  * 問題一覧画面コンポーネント
@@ -51,7 +57,7 @@ export default function ProblemListScreen({ navigation }: Props) {
   /**
    * 問題一覧を読み込む
    */
-  const loadProblems = async () => {
+  const loadProblems = useCallback(async () => {
     try {
       setError(null);
       const data = await apiClient.getProblems();
@@ -59,22 +65,21 @@ export default function ProblemListScreen({ navigation }: Props) {
     } catch (error: any) {
       console.error("Failed to load problems:", error);
       // エラーメッセージを状態に設定
-      const errorMessage = error?.response?.data?.detail || error?.message || "問題の読み込みに失敗しました";
-      setError(`エラー: ${errorMessage}\n\nAPI URLの設定を確認してください。\n詳細は SETUP_API_URL.md を参照してください。`);
+      const errorMessage = getErrorMessage(error);
+      setError(errorMessage);
       setProblems([]);
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
-  };
-
-  useEffect(() => {
-    loadProblems();
   }, []);
 
-  // 画面がフォーカスされたときにスクロール位置を復元
+  // 画面がフォーカスされたときに問題を読み込み、スクロール位置を復元
   useFocusEffect(
-    React.useCallback(() => {
+    useCallback(() => {
+      // 問題を読み込む
+      loadProblems();
+      
       // 少し遅延させてからスクロール位置を復元（レンダリング完了後）
       const timer = setTimeout(() => {
         if (flatListRef.current && savedScrollOffset > 0) {
@@ -85,7 +90,7 @@ export default function ProblemListScreen({ navigation }: Props) {
         }
       }, 100);
       return () => clearTimeout(timer);
-    }, [])
+    }, [loadProblems])
   );
 
   const onRefresh = () => {
@@ -351,11 +356,11 @@ export default function ProblemListScreen({ navigation }: Props) {
           </ScrollView>
         )}
       </View>
-      <FlatList
+      <FlatList<ProblemListItem>
         testID="problem-list"
         ref={flatListRef}
-        data={viewMode === "all" ? filteredProblems : flatListData}
-        renderItem={viewMode === "all" ? renderItem : renderFlatListItem}
+        data={(viewMode === "all" ? (filteredProblems as any) : (flatListData as any)) as ProblemListItem[]}
+        renderItem={viewMode === "all" ? (renderItem as any) : (renderFlatListItem as any)}
         keyExtractor={(item, index) =>
           viewMode === "all"
             ? (item as Problem).id

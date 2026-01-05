@@ -20,6 +20,9 @@ import MarkdownRenderer from "../components/MarkdownRenderer";
 import { RootStackParamList } from "../../App";
 import { apiClient } from "../services/api";
 import { Problem, Language } from "../types/api";
+import { getErrorMessage, isUnauthorizedError } from "../utils/errorHandler";
+import ErrorMessageModal from "../components/ErrorMessageModal";
+import ConfirmModal from "../components/ConfirmModal";
 
 type Props = NativeStackScreenProps<RootStackParamList, "ProblemDetail">;
 
@@ -40,6 +43,10 @@ export default function ProblemDetailScreen({ route, navigation }: Props) {
   const [showHint, setShowHint] = useState(false);
   const [showSolution, setShowSolution] = useState(false);
   const scrollViewRef = useRef<ScrollView>(null);
+  const [errorModalVisible, setErrorModalVisible] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [errorTitle, setErrorTitle] = useState("エラー");
+  const [loginModalVisible, setLoginModalVisible] = useState(false);
 
   useEffect(() => {
     loadProblem();
@@ -69,9 +76,20 @@ export default function ProblemDetailScreen({ route, navigation }: Props) {
       if (data.supported_languages && data.supported_languages.length > 0) {
         setSelectedLanguage(data.supported_languages[0]);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to load problem:", error);
-      // TODO: エラー表示
+      const message = getErrorMessage(error);
+
+      // 401エラーの場合はログイン画面に遷移する確認モーダルを表示
+      if (isUnauthorizedError(error)) {
+        setErrorTitle("ログインが必要です");
+        setErrorMessage(message);
+        setLoginModalVisible(true);
+      } else {
+        setErrorTitle("エラー");
+        setErrorMessage(message);
+        setErrorModalVisible(true);
+      }
     } finally {
       setLoading(false);
     }

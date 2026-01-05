@@ -17,7 +17,6 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
-  Alert,
 } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import MarkdownRenderer from "../components/MarkdownRenderer";
@@ -30,6 +29,10 @@ import {
   saveDraftLocally,
   getDraftLocally,
 } from "../utils/storage";
+import { getErrorMessage, isUnauthorizedError } from "../utils/errorHandler";
+import ErrorMessageModal from "../components/ErrorMessageModal";
+import ConfirmModal from "../components/ConfirmModal";
+import SuccessMessageModal from "../components/SuccessMessageModal";
 
 type Props = NativeStackScreenProps<RootStackParamList, "CodeEditor">;
 
@@ -155,6 +158,14 @@ export default function CodeEditorScreen({ route, navigation }: Props) {
   const [showHint, setShowHint] = useState(false);
   const [showSolution, setShowSolution] = useState(false);
 
+  // モーダル表示状態
+  const [errorModalVisible, setErrorModalVisible] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [errorTitle, setErrorTitle] = useState("エラー");
+  const [loginModalVisible, setLoginModalVisible] = useState(false);
+  const [successModalVisible, setSuccessModalVisible] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+
   useEffect(() => {
     loadProblemAndDraft();
     return () => {
@@ -260,9 +271,20 @@ export default function CodeEditorScreen({ route, navigation }: Props) {
         setHistory([initialCode]);
         setHistoryIndex(0);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to load problem:", error);
-      Alert.alert("エラー", "問題の読み込みに失敗しました");
+      const errorMessage = getErrorMessage(error);
+
+      // 401エラーの場合はログイン画面に遷移する確認モーダルを表示
+      if (isUnauthorizedError(error)) {
+        setErrorTitle("ログインが必要です");
+        setErrorMessage(errorMessage);
+        setLoginModalVisible(true);
+      } else {
+        setErrorTitle("エラー");
+        setErrorMessage(errorMessage);
+        setErrorModalVisible(true);
+      }
     } finally {
       setLoading(false);
     }
@@ -428,10 +450,13 @@ export default function CodeEditorScreen({ route, navigation }: Props) {
   const handleCopyCode = async () => {
     try {
       await Clipboard.setStringAsync(code);
-      Alert.alert("コピー完了", "コードをクリップボードにコピーしました");
+      setSuccessMessage("コードをクリップボードにコピーしました");
+      setSuccessModalVisible(true);
     } catch (error) {
       console.error("Failed to copy code:", error);
-      Alert.alert("エラー", "コピーに失敗しました");
+      setErrorTitle("エラー");
+      setErrorMessage("コピーに失敗しました");
+      setErrorModalVisible(true);
     }
   };
 
@@ -443,10 +468,13 @@ export default function CodeEditorScreen({ route, navigation }: Props) {
     try {
       const problemText = `${problem.id}: ${problem.title}\n\n${problem.description}`;
       await Clipboard.setStringAsync(problemText);
-      Alert.alert("コピー完了", "問題文をクリップボードにコピーしました");
+      setSuccessMessage("問題文をクリップボードにコピーしました");
+      setSuccessModalVisible(true);
     } catch (error) {
       console.error("Failed to copy problem:", error);
-      Alert.alert("エラー", "コピーに失敗しました");
+      setErrorTitle("エラー");
+      setErrorMessage("コピーに失敗しました");
+      setErrorModalVisible(true);
     }
   };
 
@@ -458,7 +486,9 @@ export default function CodeEditorScreen({ route, navigation }: Props) {
    */
   const handleRun = async () => {
     if (!code.trim()) {
-      Alert.alert("エラー", "コードを入力してください");
+      setErrorTitle("エラー");
+      setErrorMessage("コードを入力してください");
+      setErrorModalVisible(true);
       return;
     }
 
@@ -476,10 +506,18 @@ export default function CodeEditorScreen({ route, navigation }: Props) {
       setExecutionResult(result);
     } catch (error: any) {
       console.error("Failed to run code:", error);
-      Alert.alert(
-        "エラー",
-        error.response?.data?.detail || "実行に失敗しました"
-      );
+      const errorMessage = getErrorMessage(error);
+
+      // 401エラーの場合はログイン画面に遷移する確認モーダルを表示
+      if (isUnauthorizedError(error)) {
+        setErrorTitle("ログインが必要です");
+        setErrorMessage(errorMessage);
+        setLoginModalVisible(true);
+      } else {
+        setErrorTitle("エラー");
+        setErrorMessage(errorMessage);
+        setErrorModalVisible(true);
+      }
     } finally {
       setExecuting(false);
     }
@@ -841,6 +879,36 @@ export default function CodeEditorScreen({ route, navigation }: Props) {
           </View>
         )}
       </ScrollView>
+
+      <ErrorMessageModal
+        visible={errorModalVisible}
+        message={errorMessage}
+        title={errorTitle}
+        onClose={() => setErrorModalVisible(false)}
+      />
+
+      <ConfirmModal
+        visible={loginModalVisible}
+        message={errorMessage}
+        title="ログインが必要です"
+        confirmText="ログイン"
+        cancelText="キャンセル"
+        onClose={() => {
+          setLoginModalVisible(false);
+          navigation.goBack();
+        }}
+        onConfirm={() => {
+          setLoginModalVisible(false);
+          navigation.navigate("Login");
+        }}
+      />
+
+      <SuccessMessageModal
+        visible={successModalVisible}
+        message={successMessage}
+        title="成功"
+        onClose={() => setSuccessModalVisible(false)}
+      />
     </KeyboardAvoidingView>
   );
 }

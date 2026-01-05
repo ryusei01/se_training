@@ -2,14 +2,19 @@
   "id": "ct-002",
   "title": "配列の最大部分和",
   "difficulty": "medium",
-  "category": ["array", "dynamic-programming"],
+  "category": [
+    "array",
+    "dynamic-programming"
+  ],
   "time_limit_sec": 1.0,
   "memory_limit_mb": 256,
   "description": "# 配列の最大部分和\n\n## 問題概要\n\n整数の配列 `nums` が与えられます。連続する部分配列の和の最大値を求めてください。\n\n## 入力仕様\n\n- `nums`: 整数のリスト（長さ: 1以上）\n\n## 出力仕様\n\n- `int`: 連続する部分配列の和の最大値\n\n## 制約条件\n\n- `1 <= len(nums) <= 10^5`\n- `-10^4 <= nums[i] <= 10^4`\n\n## サンプル入力・出力\n\n### サンプル1\n\n入力:\n```python\nnums = [-2, 1, -3, 4, -1, 2, 1, -5, 4]\n```\n\n出力:\n```python\n6  # [4, -1, 2, 1] の和\n```\n\n### サンプル2\n\n入力:\n```python\nnums = [1]\n```\n\n出力:\n```python\n1\n```\n\n### サンプル3\n\n入力:\n```python\nnums = [5, 4, -1, 7, 8]\n```\n\n出力:\n```python\n23  # すべての要素の和\n```\n\n### サンプル4\n\n入力:\n```python\nnums = [-1]\n```\n\n出力:\n```python\n-1\n```",
   "function_signature": "def solve(nums: list[int]) -> int:",
   "test_code": "def test_sample1():\n    assert solve([-2, 1, -3, 4, -1, 2, 1, -5, 4]) == 6\n\ndef test_sample2():\n    assert solve([1]) == 1\n\ndef test_sample3():\n    assert solve([5, 4, -1, 7, 8]) == 23\n\ndef test_sample4():\n    assert solve([-1]) == -1\n\ndef test_all_negative():\n    assert solve([-2, -1, -3]) == -1\n\ndef test_all_positive():\n    assert solve([1, 2, 3, 4]) == 10\n\ndef test_single_element():\n    assert solve([5]) == 5\n    assert solve([-5]) == -5",
-  "supported_languages": ["python", "typescript"],
+  "supported_languages": [
+    "python",
+    "typescript"
+  ],
   "hint": "## ヒント\n\nこの問題は「Kadaneのアルゴリズム」と呼ばれる動的プログラミングの典型問題です。\n\n### 考え方\n\n各位置での「最適な部分配列の和」を考えます。新しい要素を見た時に：\n\n1. **既存の部分配列を継続する**: `current_sum + nums[i]`\n2. **新しい部分配列を開始する**: `nums[i]`\n\nこの2つのうち、大きい方を選びます。\n\nつまり、`current_sum = max(current_sum + nums[i], nums[i])`\n\nこの`current_sum`の最大値が答えになります。",
-  "solution": "## 答えと解説\n\n### Kadaneのアルゴリズム\n\n```python\ndef solve(nums: list[int]) -> int:\n    max_sum = current_sum = nums[0]\n    \n    for i in range(1, len(nums)):\n        # 現在の要素を加えるか、新しい部分配列を開始するか\n        current_sum = max(nums[i], current_sum + nums[i])\n        # 最大値を更新\n        max_sum = max(max_sum, current_sum)\n    \n    return max_sum\n```\n\n**時間計算量**: O(n)\n**空間計算量**: O(1)\n\n### 解説\n\nこのアルゴリズムは以下のアイデアに基づいています：\n\n1. **部分問題**: 各位置`i`で、「位置`i`で終わる部分配列の最大和」を求める\n2. **最適部分構造**: 位置`i-1`での最大和が分かっていれば、位置`i`での最大和は以下の2つの選択肢のうち大きい方：\n   - 位置`i-1`までの部分配列を継続: `current_sum + nums[i]`\n   - 新しい部分配列を開始: `nums[i]`\n\n### 動作例\n\n`nums = [-2, 1, -3, 4, -1, 2, 1, -5, 4]` の場合：\n\n- i=0: current_sum = -2, max_sum = -2\n- i=1: current_sum = max(1, -2+1) = 1, max_sum = 1\n- i=2: current_sum = max(-3, 1-3) = -2, max_sum = 1\n- i=3: current_sum = max(4, -2+4) = 4, max_sum = 4\n- i=4: current_sum = max(-1, 4-1) = 3, max_sum = 4\n- i=5: current_sum = max(2, 3+2) = 5, max_sum = 5\n- i=6: current_sum = max(1, 5+1) = 6, max_sum = 6\n- i=7: current_sum = max(-5, 6-5) = 1, max_sum = 6\n- i=8: current_sum = max(4, 1+4) = 5, max_sum = 6\n\n答え: 6（`[4, -1, 2, 1]`の和）"
+  "solution": "## 答えと解説\n\n### Kadaneのアルゴリズム\n\n```python\ndef solve(nums: list[int]) -> int:\n    max_sum = current_sum = nums[0]\n    \n    for i in range(1, len(nums)):\n        # 現在の要素を加えるか、新しい部分配列を開始するか\n        current_sum = max(nums[i], current_sum + nums[i])\n        # 最大値を更新\n        max_sum = max(max_sum, current_sum)\n    \n    return max_sum\n```\n\n```typescript\nexport function solve(nums: number[]) : number {\n    max_sum = current_sum = nums[0]\n    \n    for i in range(1, nums.length):\n        # 現在の要素を加えるか、新しい部分配列を開始するか\n        current_sum = max(nums[i], current_sum + nums[i])\n        # 最大値を更新\n        max_sum = max(max_sum, current_sum)\n    \n    return max_sum\n```\n\n**時間計算量**: O(n)\n**空間計算量**: O(1)\n\n### 解説\n\nこのアルゴリズムは以下のアイデアに基づいています：\n\n1. **部分問題**: 各位置`i`で、「位置`i`で終わる部分配列の最大和」を求める\n2. **最適部分構造**: 位置`i-1`での最大和が分かっていれば、位置`i`での最大和は以下の2つの選択肢のうち大きい方：\n   - 位置`i-1`までの部分配列を継続: `current_sum + nums[i]`\n   - 新しい部分配列を開始: `nums[i]`\n\n### 動作例\n\n`nums = [-2, 1, -3, 4, -1, 2, 1, -5, 4]` の場合：\n\n- i=0: current_sum = -2, max_sum = -2\n- i=1: current_sum = max(1, -2+1) = 1, max_sum = 1\n- i=2: current_sum = max(-3, 1-3) = -2, max_sum = 1\n- i=3: current_sum = max(4, -2+4) = 4, max_sum = 4\n- i=4: current_sum = max(-1, 4-1) = 3, max_sum = 4\n- i=5: current_sum = max(2, 3+2) = 5, max_sum = 5\n- i=6: current_sum = max(1, 5+1) = 6, max_sum = 6\n- i=7: current_sum = max(-5, 6-5) = 1, max_sum = 6\n- i=8: current_sum = max(4, 1+4) = 5, max_sum = 6\n\n答え: 6（`[4, -1, 2, 1]`の和）"
 }
-

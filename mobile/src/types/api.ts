@@ -80,5 +80,121 @@ export interface SaveDraftRequest {
   user_id?: string;  // ユーザーID（オプション）
 }
 
+/**
+ * ファイルツリー項目
+ */
+export interface FileTreeItem {
+  name: string;
+  type: "file" | "folder";
+  path: string;
+  content?: string;
+  children?: FileTreeItem[];
+  highlighted_lines?: number[];
+}
+
+/**
+ * 実行データ
+ */
+export interface RunExecuteData {
+  type: "frontend" | "api" | "deploy";
+  frontend_url?: string;
+  api_endpoint?: string;
+  api_method?: string;
+  api_request_body?: any;
+  deploy_logs?: string;
+}
+
+/**
+ * 結果確認データ
+ */
+export interface ResultData {
+  type: "screen" | "network" | "logs";
+  screen_url?: string;
+  network_data?: any[];
+  logs_data?: any[];
+}
+
+/**
+ * 理解チェックデータ
+ */
+export interface CheckData {
+  questions: Array<{
+    question: string;
+    options?: string[];
+    answer?: string;
+  }>;
+}
+
+/**
+ * 文書決裁デモ（申請）
+ */
+export type RequestStatus = "draft" | "submitted" | "approved" | "returned" | "rejected";
+
+export interface ApprovalRequest {
+  id: number;
+  title: string;
+  body?: string;
+  status: RequestStatus;
+  created_at: string;
+  updated_at: string;
+}
+
+/**
+ * 章情報のインターフェース
+ */
+export interface Chapter {
+  id: number;  // 章ID
+  course_id: number;  // コースID
+  title: string;  // 章タイトル
+  order_index: number;  // 表示順序
+  content?: string;  // 章のコンテンツ（Markdown形式、全体説明）
+  goal?: string;  // Goal（この章でできるようになること）
+  system_overview?: string;  // System Overview（今どこを触っているか）
+  file_explorer_data?: string;  // File Explorer（JSON形式のファイルツリーデータ）
+  hands_on_steps?: string;  // Hands-on Steps（操作手順）
+  run_execute_data?: string;  // Run / Execute（実行データ、JSON形式）
+  result_data?: string;  // Result（結果確認データ、JSON形式）
+  why_it_works?: string;  // Why it works（仕組み解説）
+  check_data?: string;  // Check（理解チェックデータ、JSON形式）
+  is_active: boolean;  // 有効/無効フラグ
+  created_at: string;  // 作成日時（ISO形式）
+  updated_at: string;  // 最終更新日時（ISO形式）
+}
+
+/**
+ * 学習記録（進捗）
+ */
+export interface ProgressRecord {
+  id: number;
+  user_id: number;
+  chapter_id?: number;
+  checklist_item_id?: number;
+  is_completed: boolean;
+  completed_at?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+/**
+ * 進捗エクスポートデータ
+ */
+export interface ProgressExport {
+  version: string;
+  exported_at: string;
+  user_id: number;
+  records: ProgressRecord[];
+}
+
+/**
+ * 進捗インポートデータ
+ */
+export interface ProgressImport {
+  records: Array<{
+    chapter_id?: number;
+    checklist_item_id?: number;
+    is_completed: boolean;
+  }>;
+}
+
 
 

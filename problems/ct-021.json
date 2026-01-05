@@ -2,15 +2,20 @@
   "id": "ct-021",
   "title": "根→葉の数値として連結",
   "difficulty": "medium",
-  "category": ["tree", "dfs", "string"],
+  "category": [
+    "tree",
+    "dfs",
+    "string"
+  ],
   "time_limit_sec": 1.0,
   "memory_limit_mb": 256,
   "description": "# 根→葉の数値として連結\n\n## 問題概要\n\n各経路について、ノードの数字を文字列として連結して1つの整数とみなします。その整数を全経路で合計してください。\n\n例：経路 1→0→5 は整数 105 となります。\n\n## 入力仕様\n\n- `root`: 二分木のルートノード。各ノードは以下のプロパティを持つ\n  - `val`: ノードの値（0-9の整数）\n  - `left`: 左の子ノード（ノードまたは `null`）\n  - `right`: 右の子ノード（ノードまたは `null`）\n\n## 出力仕様\n\n- `int`: すべての経路を整数として解釈した値の合計\n\n## 制約条件\n\n- ノード数は 1 以上 1000 以下\n- `0 <= val <= 9`\n\n## サンプル入力・出力\n\n### サンプル1\n\n入力:\n```\n        1\n      /   \\\n     0     4\n    / \\   / \\\n   5  1  2   3\n```\n\n出力:\n```\n1317  # 経路1: 1→0→5 = 105\n      # 経路2: 1→0→1 = 101\n      # 経路3: 1→4→2 = 142\n      # 経路4: 1→4→3 = 143\n      # 合計: 105+101+142+143=491\n```\n\n注: 実際の計算では 105+101+142+143=491",
   "function_signature": "def solve(root) -> int:",
   "test_code": "class TreeNode:\n    def __init__(self, val=0, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n\ndef test_sample1():\n    #        1\n    #      /   \\\n    #     0     4\n    #    / \\   / \\\n    #   5  1  2   3\n    root = TreeNode(1)\n    root.left = TreeNode(0)\n    root.right = TreeNode(4)\n    root.left.left = TreeNode(5)\n    root.left.right = TreeNode(1)\n    root.right.left = TreeNode(2)\n    root.right.right = TreeNode(3)\n    result = solve(root)\n    # 経路: 105, 101, 142, 143\n    # 合計: 491\n    assert result == 491\n\ndef test_single_node():\n    root = TreeNode(5)\n    assert solve(root) == 5\n\ndef test_two_levels():\n    root = TreeNode(1)\n    root.left = TreeNode(2)\n    root.right = TreeNode(3)\n    # 経路: 12, 13\n    # 合計: 25\n    assert solve(root) == 25",
-  "supported_languages": ["python", "typescript"],
+  "supported_languages": [
+    "python",
+    "typescript"
+  ],
   "hint": "## ヒント\n\n- 各経路を整数として解釈する必要があります\n- ルートから葉まで、数字を文字列として連結して整数に変換します\n- DFSを使って、現在までの経路を整数として表現します\n- 親ノードの値を10倍して、現在のノードの値を足すことで、整数として連結できます\n- 葉ノードに到達したら、その時点での整数値を返します",
-  "solution": "## 答えと解説\n\nこの問題は、ルートから葉までの各経路を整数として解釈し、それらの合計を求める問題です。\n\n### アプローチ\n\nDFS（深さ優先探索）を使って、ルートから葉までの全経路を探索します。各経路について、ノードの値を10倍して累積していくことで、整数として連結します。\n\n### 実装コード\n\n```python\ndef solve(root) -> int:\n    def dfs(node, current_value):\n        if node is None:\n            return 0\n        \n        # 現在のノードの値を整数として連結\n        new_value = current_value * 10 + node.val\n        \n        # 葉ノードの場合、現在の整数値を返す\n        if node.left is None and node.right is None:\n            return new_value\n        \n        # 左右の子ノードから返ってきた値を合計\n        return dfs(node.left, new_value) + dfs(node.right, new_value)\n    \n    return dfs(root, 0)\n```\n\n### 動作例\n\nサンプル1の場合：\n```\n        1\n      /   \\\n     0     4\n    / \\   / \\\n   5  1  2   3\n```\n\n- 経路1: 1→0→5 → 105\n- 経路2: 1→0→1 → 101\n- 経路3: 1→4→2 → 142\n- 経路4: 1→4→3 → 143\n- 合計: 105+101+142+143=491\n\n### 時間計算量\n\n- O(N): Nはノード数。各ノードを1回ずつ訪問します。\n\n### 空間計算量\n\n- O(H): Hは木の高さ。再帰のスタックが高さ分必要です。"
+  "solution": "## 答えと解説\n\nこの問題は、ルートから葉までの各経路を整数として解釈し、それらの合計を求める問題です。\n\n### アプローチ\n\nDFS（深さ優先探索）を使って、ルートから葉までの全経路を探索します。各経路について、ノードの値を10倍して累積していくことで、整数として連結します。\n\n### 実装コード\n\n```python\ndef solve(root) -> int:\n    def dfs(node, current_value):\n        if node is None:\n            return 0\n        \n        # 現在のノードの値を整数として連結\n        new_value = current_value * 10 + node.val\n        \n        # 葉ノードの場合、現在の整数値を返す\n        if node.left is None and node.right is None:\n            return new_value\n        \n        # 左右の子ノードから返ってきた値を合計\n        return dfs(node.left, new_value) + dfs(node.right, new_value)\n    \n    return dfs(root, 0)\n```\n\n```typescript\nexport function solve(root) : number {\n    def dfs(node, current_value):\n        if node is null:\n            return 0\n        \n        # 現在のノードの値を整数として連結\n        new_value = current_value * 10 + node.val\n        \n        # 葉ノードの場合、現在の整数値を返す\n        if node.left is null and node.right is null:\n            return new_value\n        \n        # 左右の子ノードから返ってきた値を合計\n        return dfs(node.left, new_value) + dfs(node.right, new_value)\n    \n    return dfs(root, 0)\n```\n\n### 動作例\n\nサンプル1の場合：\n```\n        1\n      /   \\\n     0     4\n    / \\   / \\\n   5  1  2   3\n```\n\n- 経路1: 1→0→5 → 105\n- 経路2: 1→0→1 → 101\n- 経路3: 1→4→2 → 142\n- 経路4: 1→4→3 → 143\n- 合計: 105+101+142+143=491\n\n### 時間計算量\n\n- O(N): Nはノード数。各ノードを1回ずつ訪問します。\n\n### 空間計算量\n\n- O(H): Hは木の高さ。再帰のスタックが高さ分必要です。"
 }
-
-
