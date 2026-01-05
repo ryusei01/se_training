@@ -62,3 +62,4 @@ class User(Base):
     subscription_history = relationship("SubscriptionHistory", back_populates="user", cascade="all, delete-orphan")
 
 
+
